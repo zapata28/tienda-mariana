@@ -1,0 +1,6 @@
+<div class="product-card">
+  <img [src]="img" [alt]="name">
+  <h4>{{ name }}</h4>
+  <p>{{ price | currency:'COP':'symbol':'1.0-0' }}</p>
+  <button (click)="addToCart()">Añadir al carrito</button>
+</div>

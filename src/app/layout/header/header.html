@@ -1,0 +1,37 @@
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span>Envío gratis por compras superiores a $150.000</span>
+  <a href="https://wa.me/573202507109?text=Hola%20👋%20Bienvenido%20a%20nuestra%20tienda">
+    WhatsApp
+  </a>
+</div>
+
+
+<!-- OVERLAY -->
+<div class="overlay" [class.active]="menuOpen" (click)="toggleMenu()"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">
+    <img src="/favicon.ico" alt="Logo" />
+    <span>MI MARCA</span>
+  </div>
+
+  <button class="menu-toggle" (click)="toggleMenu()" [class.active]="menuOpen">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav [class.open]="menuOpen">
+    <a routerLink="/">Maquillaje</a>
+    <a routerLink="/categoria/skincare">Cuidado de la piel</a>
+    <a routerLink="/categoria/maquillaje">Cuidado capilar</a>
+    <a routerLink="/categoria/accesorios">Accesorios</a>
+  </nav>
+
+  <div class="icons">
+    <span title="Carrito">🛒</span>
+    <span title="Usuario">👤</span>
+  </div>
+</header>

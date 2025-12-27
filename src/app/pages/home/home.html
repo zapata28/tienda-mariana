@@ -1,0 +1,64 @@
+<section class="hero-carousel">
+
+  <div
+    class="slide"
+    *ngFor="let slide of slides; let i = index"
+    [class.active]="i === currentSlide"
+    [style.backgroundImage]="'url(' + slide.image + ')'"
+  >
+    <div class="content">
+      <h1>{{ slide.title }}</h1>
+      <p>{{ slide.text }}</p>
+      <button>{{ slide.button }}</button>
+    </div>
+  </div>
+
+  <div class="dots">
+    <span
+      class="dot"
+      *ngFor="let slide of slides; let i = index"
+      [class.active]="i === currentSlide"
+      (click)="goToSlide(i)"
+    ></span>
+  </div>
+
+</section>
+
+<section class="categoria">
+  <h2>Maquillaje</h2>
+  <div class="grid">
+    <app-product-card *ngFor="let p of maquillaje"
+      [name]="p.name" [price]="p.price" [img]="p.img">
+    </app-product-card>
+  </div>
+</section>
+
+<section class="categoria">
+  <h2>Cuidado de la piel</h2>
+  <div class="grid">
+    <app-product-card *ngFor="let p of piel"
+      [name]="p.name" [price]="p.price" [img]="p.img">
+    </app-product-card>
+  </div>
+</section>
+
+<section class="categoria">
+  <h2>Cuidado capilar</h2>
+  <div class="grid">
+    <app-product-card *ngFor="let p of capilar"
+      [name]="p.name" [price]="p.price" [img]="p.img">
+    </app-product-card>
+  </div>
+</section>
+
+<section class="categoria">
+  <h2>Accesorios</h2>
+  <div class="grid">
+    <app-product-card *ngFor="let p of accesorios"
+      [name]="p.name" [price]="p.price" [img]="p.img">
+    </app-product-card>
+  </div>
+</section>
+
+
+

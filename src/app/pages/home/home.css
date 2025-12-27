@@ -1,0 +1,123 @@
+/* ===============================
+   HERO CAROUSEL
+================================ */
+
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  overflow: hidden;
+}
+
+/* SLIDES */
+.hero-carousel .slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+  display: flex;
+  align-items: center;
+}
+
+/* SLIDE ACTIVO */
+.hero-carousel .slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+/* CAPA OSCURA SOBRE IMAGEN */
+.hero-carousel .slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* CONTENIDO */
+.hero-carousel .content {
+  position: relative;
+  max-width: 520px;
+  margin-left: 60px;
+  color: #fff;
+}
+
+.hero-carousel h1 {
+  font-size: 40px;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+.hero-carousel p {
+  font-size: 16px;
+  margin-bottom: 22px;
+  opacity: 0.95;
+}
+
+/* BOTÓN */
+.hero-carousel button {
+  padding: 12px 22px;
+  border: none;
+  background: #2e7d32; /* verde elegante */
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.hero-carousel button:hover {
+  background: #1b5e20;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .hero-carousel {
+    height: 340px;
+  }
+
+  .hero-carousel .content {
+    margin-left: 25px;
+    margin-right: 25px;
+  }
+
+  .hero-carousel h1 {
+    font-size: 28px;
+  }
+
+  .hero-carousel p {
+    font-size: 14px;
+  }
+}
+
+/* ===============================
+   INDICADORES (DOTS)
+================================ */
+
+.hero-carousel .dots {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.hero-carousel .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.hero-carousel .dot.active {
+  background: #ffffff;
+  transform: scale(1.2);
+}
