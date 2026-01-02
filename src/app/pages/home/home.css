@@ -39,7 +39,7 @@
   z-index: 1;
 }
 
-/* Capa oscura sobre la imagen */s
+/* Capa oscura sobre la imagen */
 .hero-carousel .slide::before {
   content: "";
   position: absolute;
@@ -273,4 +273,44 @@
 .hero-carousel p,
 .hero-carousel button {
   color: #ffffff !important;
+}
+
+/* ===============================
+   NOVEDADES (HORIZONTAL)
+================================ */
+.novedades-container{
+  margin: 6px 0 18px;
+  overflow: hidden;
+}
+
+.novedades-grid{
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 6px 2px 12px;
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.novedades-grid .producto-card{
+  flex: 0 0 230px;
+  scroll-snap-align: start;
+}
+
+/* Barra bonita */
+.novedades-grid::-webkit-scrollbar{
+  height: 8px;
+}
+.novedades-grid::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,0.15);
+  border-radius: 99px;
+}
+
+/* Desktop un poco más grande */
+@media (min-width: 900px){
+  .novedades-grid .producto-card{
+    flex: 0 0 260px;
+  }
 }

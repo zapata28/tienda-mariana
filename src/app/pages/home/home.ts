@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -9,11 +9,15 @@ import { Router } from '@angular/router';
   templateUrl: './home.html',
   styleUrls: ['./home.css'],
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
 
   constructor(private router: Router) {}
 
   currentSlide = 0;
+
+  // ⏱️ autoplay config
+  private autoplayId: any = null;
+  private autoplayMs = 5000;
 
   slides = [
     {
@@ -85,13 +89,50 @@ export class Home implements OnInit {
   ];
 
   ngOnInit(): void {
-    setInterval(() => {
-      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
-    }, 5000);
+    this.startAutoplay();
   }
 
+  ngOnDestroy(): void {
+    this.stopAutoplay();
+  }
+
+  // ✅ Dots
   goToSlide(index: number) {
     this.currentSlide = index;
+    this.restartAutoplay();
+  }
+
+  // ✅ Next (autoplay)
+  private nextSlide() {
+    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+  }
+
+  // ✅ Autoplay controls
+  private startAutoplay() {
+    if (this.autoplayId) return;
+    this.autoplayId = setInterval(() => {
+      this.nextSlide();
+    }, this.autoplayMs);
+  }
+
+  private stopAutoplay() {
+    if (!this.autoplayId) return;
+    clearInterval(this.autoplayId);
+    this.autoplayId = null;
+  }
+
+  private restartAutoplay() {
+    this.stopAutoplay();
+    this.startAutoplay();
+  }
+
+  // ✅ Para pausar desde el HTML )
+  pauseAutoplay() {
+    this.stopAutoplay();
+  }
+
+  resumeAutoplay() {
+    this.startAutoplay();
   }
 
   irACategoria(slug: string) {
