@@ -1,10 +1,56 @@
+
+  <!-- BREADCRUMB -->
+<nav class="breadcrumb" aria-label="breadcrumb" *ngIf="breadcrumbs.length">
+  <ng-container *ngFor="let c of breadcrumbs; let last = last">
+    <button
+      class="crumb"
+      [class.last]="last"
+      (click)="!last && navegarCrumb(c.action)"
+      [disabled]="last"
+      type="button"
+    >
+      {{ c.label }}
+    </button>
+
+    <span class="sep" *ngIf="!last">›</span>
+  </ng-container>
+</nav>
+
 <section class="categoria-page">
-  <h1>{{ titulo }}</h1>
 
-  <p class="categoria-desc">
-    Explora todos los productos de {{ titulo }}.
-  </p>
 
+  <!-- NIVEL 1 (siempre visible) -->
+  <div class="chips-box" *ngIf="grupos.length">
+    <div class="chips">
+      <button
+        class="chip"
+        *ngFor="let g of grupos"
+        [class.active]="g.nombre === grupoActivo"
+        (click)="seleccionarGrupo(g.nombre)"
+      >
+        {{ g.nombre }}
+      </button>
+    </div>
+  </div>
+
+  <!-- NIVEL 2 (solo se muestra cuando el usuario entra a escoger y se oculta cuando selecciona "Todos") -->
+  <div class="chips-box" *ngIf="subitems.length && mostrarNivel2">
+    <div class="chips">
+      <button
+        class="chip chip-sec"
+        *ngFor="let s of subitems"
+        [class.active]="s === subitemActivo"
+        (click)="seleccionarSubitem(s)"
+      >
+        {{ s }}
+      </button>
+    </div>
+  </div>
+
+
+
+
+  <!-- Productos después -->
   <div class="productos-grid">
     <!-- aquí van productos -->
   </div>

@@ -42,32 +42,51 @@ export class Home implements OnInit {
   ];
 
   categorias = [
+    { name: 'Maquillaje', slug: 'maquillaje', img: 'assets/icons/icono-maquillaje.png' },
+    { name: 'Cuidado de la piel', slug: 'skincare', img: 'assets/icons/icono-cuidado-facial.png' },
+    { name: 'Cuidado capilar', slug: 'capilar', img: 'assets/icons/icono-cuidado-capilar.png' },
+    { name: 'Accesorios', slug: 'accesorios', img: 'assets/icons/icono-accesorios.png' }
+  ];
+
+  // ✅ NOVEDADES
+  novedades = [
     {
-      name: 'Maquillaje',
-      slug: 'maquillaje',
-      img: 'img/categorias/maquillaje.jpg'
+      id: 1,
+      nombre: 'Espuma de ampolla de centella',
+      descripcion: 'Limpieza suave, ideal para piel sensible.',
+      precio: 58000,
+      img: 'assets/img/productos/centella-foam.jpg',
+      esNuevo: true,
     },
     {
-      name: 'Cuidado de la piel',
-      slug: 'skincare',
-      img: 'img/categorias/skincare.jpg'
+      id: 2,
+      nombre: 'Serum hidratante',
+      descripcion: 'Hidratación ligera para uso diario.',
+      precio: 72000,
+      img: 'assets/img/productos/serum.jpg',
+      esNuevo: true,
     },
     {
-      name: 'Cuidado capilar',
-      slug: 'capilar',
-      img: 'img/categorias/capilar.jpg'
+      id: 3,
+      nombre: 'Shampoo reparación',
+      descripcion: 'Fortalece y aporta brillo.',
+      precio: 45000,
+      img: 'assets/img/productos/shampoo.jpg',
+      esNuevo: true,
     },
     {
-      name: 'Accesorios',
-      slug: 'accesorios',
-      img: 'img/categorias/accesorios.jpg'
-    }
+      id: 4,
+      nombre: 'Protector solar',
+      descripcion: 'Protección UV de uso diario.',
+      precio: 69000,
+      img: 'assets/img/productos/solar.jpg',
+      esNuevo: true,
+    },
   ];
 
   ngOnInit(): void {
     setInterval(() => {
-      this.currentSlide =
-        (this.currentSlide + 1) % this.slides.length;
+      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
     }, 5000);
   }
 
@@ -77,5 +96,9 @@ export class Home implements OnInit {
 
   irACategoria(slug: string) {
     this.router.navigate(['/categoria', slug]);
+  }
+
+  verProducto(id: number) {
+    this.router.navigate(['/producto', id]);
   }
 }

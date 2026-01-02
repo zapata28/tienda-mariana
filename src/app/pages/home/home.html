@@ -28,6 +28,30 @@
   <h2>NOVEDADES</h2>
 </section>
 
+<section class="novedades-container">
+  <div class="novedades-grid">
+    <article class="producto-card" *ngFor="let p of novedades" (click)="verProducto(p.id)">
+      <div class="producto-img">
+        <img [src]="p.img" [alt]="p.nombre" />
+        <span class="badge" *ngIf="p.esNuevo">Nuevo</span>
+      </div>
+
+      <div class="producto-info">
+        <h3>{{ p.nombre }}</h3>
+        <p class="desc">{{ p.descripcion }}</p>
+
+        <div class="precio-row">
+          <span class="precio">{{ p.precio | currency:'COP':'symbol':'1.0-0' }}</span>
+          <button class="btn-ver" (click)="verProducto(p.id); $event.stopPropagation()">
+            Ver producto
+          </button>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+
 <!-- ================= CATEGORÍAS ================= -->
 <section class="categoria-container">
   <div class="horizontal-scroll">

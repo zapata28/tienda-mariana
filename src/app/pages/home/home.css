@@ -7,7 +7,7 @@
   --verde-claro: #e9f5ef;
   --gris-suave: #f4f6f5;
   --texto-principal: #1f2d27;
-  --texto-tarjeta: #333333; /* texto de tarjetas */
+  --texto-tarjeta: #333333;
   --amarillo-franja: #FCC737;
   --rosa-precio: #FF937E;
   --blanco: #ffffff;
@@ -52,15 +52,13 @@
   );
 }
 
-
-
 /* Contenido */
 .hero-carousel .content {
   position: relative;
   max-width: 520px;
   margin-left: 60px;
-  color: #ffffff; /* texto en blanco */
-  z-index: 2; /* sobre la capa oscura */
+  color: var(--blanco);
+  z-index: 2;
 }
 
 .hero-carousel h1 {
@@ -68,13 +66,15 @@
   font-weight: 700;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  margin: 0 0 10px 0;
+    color:  #ffffff;
 }
 
 .hero-carousel p {
   font-size: 16px;
-  margin-bottom: 22px;
+  margin: 0 0 22px 0;
   opacity: 0.95;
-  color: var(--blanco);
+  color:  #ffffff;
 }
 
 /* Botón */
@@ -82,7 +82,6 @@
   padding: 12px 22px;
   border: none;
   background: var(--verde-principal);
-  color: var(--blanco);
   font-weight: bold;
   cursor: pointer;
   border-radius: 6px;
@@ -92,48 +91,6 @@
 .hero-carousel button:hover {
   background: var(--verde-hover);
 }
-
-/* ===============================
-   RESPONSIVE MOBILE
-================================ */
-@media (max-width: 768px) {
-
-  /* HERO */
-  .hero-carousel {
-    height: 340px;
-  }
-
-  .hero-carousel .content {
-    margin-left: 25px;
-    margin-right: 25px;
-  }
-
-  .hero-carousel h1 {
-    font-size: 28px;
-  }
-
-  .hero-carousel p {
-    font-size: 14px;
-  }
-
-  /* CATEGORÍAS */
-  .horizontal-scroll {
-    overflow-x: hidden;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .card {
-    width: calc(50% - 12px);
-    max-width: 160px;
-  }
-
-  .card img {
-    height: 110px;
-  }
-}
-
 
 /* Indicadores (dots) */
 .hero-carousel .dots {
@@ -161,31 +118,42 @@
 }
 
 /* ===============================
-   CATEGORÍAS
+   TITULOS DE SECCION (NOVEDADES / INTERESES)
+================================ */
+.section-title {
+  margin-bottom: 6px; /* más pegado a lo que sigue */
+}
+
+.section-title h2 {
+  margin: 0 0 6px 0;
+  padding: 0;
+  color: var(--texto-principal);
+}
+
+/* ===============================
+   CATEGORÍAS (CUADRO FIJO / UNIFORME)
 ================================ */
 .categoria-container {
   background-color: var(--verde-claro);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  margin: 20px 0;
+  border-radius: 16px;     /* un poco más sutil */
+  padding: 8px 16px 12px; /* ↓ MENOS ALTO */
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+  margin: 6px 0 10px;     /* ↓ menos separación */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-/* Título de categoría */
-.categoria h2 {
-  margin-bottom: 15px;
-  font-size: 1.5rem;
-  color: var(--texto-principal);
-}
 
 /* Scroll horizontal */
 .horizontal-scroll {
   display: flex;
   gap: 15px;
   overflow-x: auto;
-  padding-bottom: 10px;
   scroll-behavior: smooth;
-  justify-content: center; /* CENTRA las tarjetas */
+  justify-content: center;
+  margin-top: auto;          /* manda las tarjetas al fondo */
+  padding: 10px 0 6px;
 }
 
 .horizontal-scroll::-webkit-scrollbar {
@@ -200,39 +168,47 @@
 /* Tarjetas */
 .card {
   flex: 0 0 auto;
-  width: 150px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  overflow: hidden;
-  background-color: var(--blanco);
-  transition: transform 0.2s, box-shadow 0.2s;
+  width: 160px;
+  border-radius: 14px;
+  background: var(--blanco);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 12px 12px 10px;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14);
 }
 
+/* ✅ CUADRO FIJO PARA IMAGEN/ICONO (MISMO TAMAÑO SIEMPRE) */
 .card img {
-  height: 130px;
-  border-bottom: 1px solid var(--gris-suave);
+  width: 112px;
+  height: 112px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(47, 125, 90, 0.08);
+  border: 1px solid rgba(0,0,0,0.06);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
 }
 
-
+/* Texto de tarjeta */
 .card-info {
-  padding: 10px;
+  padding: 10px 6px 0;
   text-align: center;
 }
 
 .card-info .text {
   display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
+  font-weight: 700;
   color: var(--texto-tarjeta);
+  font-size: 14px;
 }
 
 .card-info .price {
@@ -247,5 +223,62 @@
   opacity: 0.9;
   background-color: var(--amarillo-franja);
   border-radius: 3px;
-  margin-top: 20px;
+  margin-top: 10px;
+}
+
+/* ===============================
+   RESPONSIVE MOBILE
+================================ */
+@media (max-width: 768px) {
+
+  /* HERO */
+  .hero-carousel {
+    height: 340px;
+  }
+
+  .hero-carousel .content {
+    margin-left: 25px;
+    margin-right: 25px;
+  }
+
+  .hero-carousel h1 {
+    font-size: 28px;
+  }
+
+  .hero-carousel p {
+    font-size: 14px;
+  }
+
+  /* Títulos */
+  .section-title {
+    margin-bottom: 6px;
+  }
+
+  /* CATEGORÍAS */
+  .horizontal-scroll {
+    overflow-x: hidden;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .card {
+    width: calc(50% - 12px);
+    max-width: 170px;
+  }
+
+  .card img {
+    width: 96px;
+    height: 96px;
+    padding: 10px;
+    object-fit: contain;
+  }
+}
+/* ===============================
+   TEXTO DEL CARRUSEL EN BLANCO
+================================ */
+.hero-carousel h1,
+.hero-carousel p,
+.hero-carousel button {
+  color: #ffffff !important;
 }
