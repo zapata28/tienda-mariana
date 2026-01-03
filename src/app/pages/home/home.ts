@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
+import { supabase } from '../../supabase.client';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -38,7 +38,7 @@ export class Home implements OnInit, OnDestroy {
       button: 'Explorar',
     },
     {
-      image: 'img/slide3.jpg',
+      image: '',
       title: 'Tu rutina empieza aquí',
       text: 'Mensaje promocional.',
       button: 'Ver todo',
@@ -59,7 +59,7 @@ export class Home implements OnInit, OnDestroy {
       nombre: 'Espuma de ampolla de centella',
       descripcion: 'Limpieza suave, ideal para piel sensible.',
       precio: 58000,
-      img: 'assets/img/productos/centella-foam.jpg',
+      img: '',
       esNuevo: true,
     },
     {
@@ -67,7 +67,7 @@ export class Home implements OnInit, OnDestroy {
       nombre: 'Serum hidratante',
       descripcion: 'Hidratación ligera para uso diario.',
       precio: 72000,
-      img: 'assets/img/productos/serum.jpg',
+      img: '',
       esNuevo: true,
     },
     {
@@ -75,7 +75,7 @@ export class Home implements OnInit, OnDestroy {
       nombre: 'Shampoo reparación',
       descripcion: 'Fortalece y aporta brillo.',
       precio: 45000,
-      img: 'assets/img/productos/shampoo.jpg',
+      img: '',
       esNuevo: true,
     },
     {
@@ -83,7 +83,7 @@ export class Home implements OnInit, OnDestroy {
       nombre: 'Protector solar',
       descripcion: 'Protección UV de uso diario.',
       precio: 69000,
-      img: 'assets/img/productos/solar.jpg',
+      img: '',
       esNuevo: true,
     },
   ];
@@ -95,6 +95,47 @@ export class Home implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.stopAutoplay();
   }
+
+
+
+async subirImagen(file: File) {
+  const ext = file.name.split('.').pop() || 'png';
+  const filePath = `imgs/${Date.now()}.${ext}`;
+
+  const { data: s } = await supabase.auth.getSession();
+  console.log('SESSION EN UPLOAD:', s.session?.user?.email, s.session?.user?.id);
+
+  const { error: upErr } = await supabase.storage
+    .from('productos')
+    .upload(filePath, file, {
+      upsert: false,
+      contentType: file.type || 'image/png'
+    });
+
+  if (upErr) {
+    console.error('Error subiendo imagen:', upErr);
+    return null;
+  }
+
+  const { data } = supabase.storage.from('productos').getPublicUrl(filePath);
+  console.log('✅ URL pública:', data.publicUrl);
+  return data.publicUrl;
+}
+
+
+onFileChange(event: Event) {
+  const input = event.target as HTMLInputElement;
+
+  if (!input.files || input.files.length === 0) return;
+
+  const file = input.files[0];
+  this.subirImagen(file);
+}
+
+
+
+
+
 
   // ✅ Dots
   goToSlide(index: number) {
