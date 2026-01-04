@@ -1,93 +1,122 @@
 <section class="admin-page">
   <div class="admin-header">
     <h1>Admin productos</h1>
-    <p>Crear, editar y eliminar productos (Supabase).</p>
+    <p>Crear, editar (modal) y eliminar productos.</p>
   </div>
 
-  <!-- ================= FORM ================= -->
+  <!-- ================= CREAR ================= -->
   <div class="admin-card">
-    <h2>{{ editandoId ? 'Editar producto' : 'Crear producto' }}</h2>
+    <div class="card-head">
+      <h2>Crear producto</h2>
 
-    <div class="form-grid">
-      <div class="field">
-        <label>Nombre *</label>
-        <input [(ngModel)]="form.nombre" placeholder="Ej: Base mate..." />
+      <button class="btn ghost" (click)="limpiarFormularioCrear()" [disabled]="saving || uploadBusy">
+        Limpiar
+      </button>
+    </div>
+
+    <!-- ======= SECCIÓN: DATOS ======= -->
+    <div class="form-section">
+      <h3 class="section-title">Datos</h3>
+
+      <div class="form-grid">
+        <div class="field" [class.invalid]="submittedCrear && errorsCrear.nombre">
+          <label>Nombre *</label>
+          <input [(ngModel)]="form.nombre" placeholder="Ej: Base mate..." />
+          <small class="error" *ngIf="submittedCrear && errorsCrear.nombre">{{ errorsCrear.nombre }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedCrear && errorsCrear.precio">
+          <label>Precio *</label>
+          <input type="number" [(ngModel)]="form.precio" placeholder="Ej: 59000" />
+          <small class="error" *ngIf="submittedCrear && errorsCrear.precio">{{ errorsCrear.precio }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedCrear && errorsCrear.categoria">
+          <label>Categoría *</label>
+          <select [(ngModel)]="form.categoria" (change)="onCategoriaChangeCrear()">
+            <option value="maquillaje">Maquillaje</option>
+            <option value="skincare">Cuidado de la piel</option>
+            <option value="capilar">Cuidado capilar</option>
+            <option value="accesorios">Accesorios</option>
+          </select>
+          <small class="error" *ngIf="submittedCrear && errorsCrear.categoria">{{ errorsCrear.categoria }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedCrear && errorsCrear.grupo">
+          <label>Grupo *</label>
+          <select [(ngModel)]="form.grupo" (change)="onGrupoChangeCrear()">
+            <option *ngFor="let g of getGrupos(form.categoria)" [value]="g.nombre">
+              {{ g.nombre }}
+            </option>
+          </select>
+          <small class="error" *ngIf="submittedCrear && errorsCrear.grupo">{{ errorsCrear.grupo }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedCrear && errorsCrear.subgrupo">
+          <label>Subgrupo *</label>
+          <select [(ngModel)]="form.subgrupo">
+            <option *ngFor="let s of getSubgrupos(form.categoria, form.grupo)" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+          <small class="error" *ngIf="submittedCrear && errorsCrear.subgrupo">{{ errorsCrear.subgrupo }}</small>
+        </div>
+
+        <div class="field field-full">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="form.descripcion" rows="3" placeholder="Opcional..."></textarea>
+        </div>
       </div>
+    </div>
 
-      <div class="field">
-        <label>Precio *</label>
-        <input type="number" [(ngModel)]="form.precio" placeholder="Ej: 59000" />
+    <!-- ======= SECCIÓN: PROMOS ======= -->
+    <div class="form-section soft">
+      <h3 class="section-title">Promos</h3>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="form.es_nuevo" />
+            Nuevo
+          </label>
+        </div>
+
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="form.en_oferta" />
+            Oferta
+          </label>
+        </div>
+
+        <div class="field" *ngIf="form.en_oferta" [class.invalid]="submittedCrear && errorsCrear.precio_antes">
+          <label>Precio antes *</label>
+          <input type="number" [(ngModel)]="form.precio_antes" placeholder="Ej: 79000" />
+          <small class="error" *ngIf="submittedCrear && errorsCrear.precio_antes">{{ errorsCrear.precio_antes }}</small>
+        </div>
       </div>
+    </div>
 
-      <div class="field">
-        <label>Categoría *</label>
-        <select [(ngModel)]="form.categoria">
-          <option value="maquillaje">Maquillaje</option>
-          <option value="skincare">Cuidado de la piel</option>
-          <option value="capilar">Cuidado capilar</option>
-          <option value="accesorios">Accesorios</option>
-        </select>
-      </div>
+    <!-- ======= SECCIÓN: IMAGEN ======= -->
+    <div class="form-section">
+      <h3 class="section-title">Imagen</h3>
 
-      <div class="field">
-        <label>Grupo *</label>
-        <input [(ngModel)]="form.grupo" placeholder="Ej: Rostro" />
-      </div>
-
-      <div class="field">
-        <label>Subgrupo *</label>
-        <input [(ngModel)]="form.subgrupo" placeholder="Ej: Bases" />
-      </div>
-
-      <div class="field field-full">
-        <label>Descripción</label>
-        <textarea [(ngModel)]="form.descripcion" rows="3" placeholder="Opcional..."></textarea>
-      </div>
-
-      <div class="field">
-        <label>
-          <input type="checkbox" [(ngModel)]="form.es_nuevo" />
-          Nuevo
-        </label>
-      </div>
-
-      <div class="field">
-        <label>
-          <input type="checkbox" [(ngModel)]="form.en_oferta" />
-          Oferta
-        </label>
-      </div>
-
-      <div class="field" *ngIf="form.en_oferta">
-        <label>Precio antes *</label>
-        <input type="number" [(ngModel)]="form.precio_antes" placeholder="Ej: 79000" />
-      </div>
-
-      <!-- Imagen -->
       <div class="field field-full">
         <label>Imagen</label>
+
         <div class="img-row">
-          <input type="file" accept="image/*" (change)="onFileChange($event)" />
+          <input type="file" accept="image/*" (change)="onFileChangeCrear($event)" />
           <span class="hint" *ngIf="uploadBusy">Subiendo imagen...</span>
         </div>
 
         <div class="img-preview" *ngIf="imagenPreviewLocal || form.imagen">
           <img [src]="imagenPreviewLocal || form.imagen" alt="preview" />
-          <div class="img-url" *ngIf="form.imagen">
-            <small>URL guardada:</small>
-            <div class="mono">{{ form.imagen }}</div>
-          </div>
         </div>
       </div>
     </div>
 
     <div class="actions">
-      <button class="btn primary" (click)="guardar()" [disabled]="saving || uploadBusy">
-        {{ saving ? 'Guardando...' : (editandoId ? 'Actualizar' : 'Crear') }}
-      </button>
-
-      <button class="btn" *ngIf="editandoId" (click)="limpiarFormulario()" [disabled]="saving || uploadBusy">
-        Cancelar edición
+      <button class="btn primary" (click)="crearProducto()" [disabled]="saving || uploadBusy">
+        {{ saving ? 'Guardando...' : 'Crear' }}
       </button>
     </div>
   </div>
@@ -123,9 +152,7 @@
 
         <div class="info">
           <h3>{{ p.nombre }}</h3>
-          <p class="meta">
-            <b>{{ p.categoria }}</b> · {{ p.grupo }} / {{ p.subgrupo }}
-          </p>
+          <p class="meta"><b>{{ p.categoria }}</b> · {{ p.grupo }} / {{ p.subgrupo }}</p>
 
           <div class="price">
             <span class="now">{{ p.precio | currency:'COP':'symbol':'1.0-0' }}</span>
@@ -135,7 +162,7 @@
           </div>
 
           <div class="row-actions">
-            <button class="btn" (click)="editar(p)">Editar</button>
+            <button class="btn" (click)="abrirModalEditar(p)">Editar</button>
             <button class="btn danger" (click)="eliminar(p)">Eliminar</button>
           </div>
         </div>
@@ -144,6 +171,113 @@
 
     <div class="empty" *ngIf="!loading && productos.length === 0">
       No hay productos con ese filtro.
+    </div>
+  </div>
+
+  <!-- ================= MODAL EDITAR ================= -->
+  <div class="modal-backdrop" *ngIf="modalVisible" [class.closing]="modalClosing" (click)="cerrarModal()"></div>
+
+  <div
+    class="modal"
+    *ngIf="modalVisible"
+    [class.closing]="modalClosing"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Editar producto</h3>
+        <button class="icon-btn" (click)="cerrarModal()">✕</button>
+      </div>
+
+      <div class="form-grid modal-grid">
+        <div class="field" [class.invalid]="submittedEditar && errorsEditar.nombre">
+          <label>Nombre *</label>
+          <input [(ngModel)]="editForm.nombre" />
+          <small class="error" *ngIf="submittedEditar && errorsEditar.nombre">{{ errorsEditar.nombre }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedEditar && errorsEditar.precio">
+          <label>Precio *</label>
+          <input type="number" [(ngModel)]="editForm.precio" />
+          <small class="error" *ngIf="submittedEditar && errorsEditar.precio">{{ errorsEditar.precio }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedEditar && errorsEditar.categoria">
+          <label>Categoría *</label>
+          <select [(ngModel)]="editForm.categoria" (change)="onCategoriaChangeEditar()">
+            <option value="maquillaje">Maquillaje</option>
+            <option value="skincare">Cuidado de la piel</option>
+            <option value="capilar">Cuidado capilar</option>
+            <option value="accesorios">Accesorios</option>
+          </select>
+          <small class="error" *ngIf="submittedEditar && errorsEditar.categoria">{{ errorsEditar.categoria }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedEditar && errorsEditar.grupo">
+          <label>Grupo *</label>
+          <select [(ngModel)]="editForm.grupo" (change)="onGrupoChangeEditar()">
+            <option *ngFor="let g of getGrupos(editForm.categoria)" [value]="g.nombre">
+              {{ g.nombre }}
+            </option>
+          </select>
+          <small class="error" *ngIf="submittedEditar && errorsEditar.grupo">{{ errorsEditar.grupo }}</small>
+        </div>
+
+        <div class="field" [class.invalid]="submittedEditar && errorsEditar.subgrupo">
+          <label>Subgrupo *</label>
+          <select [(ngModel)]="editForm.subgrupo">
+            <option *ngFor="let s of getSubgrupos(editForm.categoria, editForm.grupo)" [value]="s">
+              {{ s }}
+            </option>
+          </select>
+          <small class="error" *ngIf="submittedEditar && errorsEditar.subgrupo">{{ errorsEditar.subgrupo }}</small>
+        </div>
+
+        <div class="field field-full">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="editForm.descripcion" rows="3"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="editForm.es_nuevo" />
+            Nuevo
+          </label>
+        </div>
+
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" [(ngModel)]="editForm.en_oferta" />
+            Oferta
+          </label>
+        </div>
+
+        <div class="field" *ngIf="editForm.en_oferta" [class.invalid]="submittedEditar && errorsEditar.precio_antes">
+          <label>Precio antes *</label>
+          <input type="number" [(ngModel)]="editForm.precio_antes" />
+          <small class="error" *ngIf="submittedEditar && errorsEditar.precio_antes">{{ errorsEditar.precio_antes }}</small>
+        </div>
+
+        <div class="field field-full">
+          <label>Cambiar imagen</label>
+          <div class="img-row">
+            <input type="file" accept="image/*" (change)="onFileChangeEditar($event)" />
+            <span class="hint" *ngIf="uploadBusy">Subiendo...</span>
+          </div>
+
+          <div class="img-preview" *ngIf="editPreviewLocal || editForm.imagen">
+            <img [src]="editPreviewLocal || editForm.imagen" alt="preview" />
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" (click)="cerrarModal()" [disabled]="saving || uploadBusy">Cancelar</button>
+        <button class="btn primary" (click)="guardarEdicion()" [disabled]="saving || uploadBusy">
+          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+      </div>
     </div>
   </div>
 </section>

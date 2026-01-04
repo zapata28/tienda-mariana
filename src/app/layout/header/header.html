@@ -44,9 +44,6 @@
     <a routerLink="/categoria/accesorios" routerLinkActive="active" (click)="closeAll()">
       Accesorios
     </a>
-    <a routerLink="/">Inicio</a>
-<a routerLink="/categoria/maquillaje">Maquillaje</a>
-
 <!-- SOLO si está logueado -->
 <a *ngIf="auth.isLoggedIn()" routerLink="/admin">Admin</a>
 

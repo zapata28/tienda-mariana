@@ -47,25 +47,88 @@ export class Admin implements OnInit {
 
   productos: Producto[] = [];
 
-  // Para editar
-  editandoId: string | null = null;
+  // =========================
+  // Catálogo (Categoría → Grupo → Subgrupo)
+  // =========================
+  catalogo: Record<CategoriaSlug, { nombre: string; items: string[] }[]> = {
+    maquillaje: [
+      { nombre: 'Rostro', items: ['Bases', 'Bb cream', 'Correctores', 'Polvos', 'Primer', 'Contornos', 'Iluminadores', 'Rubores', 'Bronzer', 'Fijadores'] },
+      { nombre: 'Ojos', items: ['Delineadores', 'Pestañinas', 'Sombras', 'Cejas', 'Pestañas postizas'] },
+      { nombre: 'Labios', items: ['Bálsamo labial', 'Brillo labial', 'Labial', 'Tinta de labios', 'Delineador de labios'] },
+      { nombre: 'Accesorios de maquillaje', items: ['Brochas', 'Cosmetiqueras', 'Encrespadores', 'Esponjas y aplicadores'] },
+      { nombre: 'Otros', items: ['Kits de maquillaje', 'Complementos'] },
+    ],
+    skincare: [
+      { nombre: 'Cuidado facial', items: ['Limpiadores y desmaquillantes', 'Aguas micelares y tónicos', 'Mascarillas', 'Hidratantes y tratamientos', 'Contorno de ojos', 'Exfoliantes faciales', 'Kits'] },
+      { nombre: 'Protección solar', items: ['Protector solar', 'Bronceadores'] },
+      { nombre: 'Otros cuidado', items: ['Depilación', 'Masajeadores'] },
+    ],
+    capilar: [
+      { nombre: 'Limpieza y tratamientos', items: ['Shampoo', 'Acondicionador', 'Mascarillas y tratamientos', 'Serum y óleos'] },
+      { nombre: 'Styling', items: ['Cremas de peinar y desenredantes', 'Fijadores y laca', 'Termoprotectores', 'Mousse y espumas', 'Shampoo seco'] },
+      { nombre: 'Eléctricos', items: ['Cepillos eléctricos', 'Planchas', 'Rizadores', 'Secadores'] },
+    ],
+    accesorios: [
+      { nombre: 'Accesorios', items: ['Collares', 'Aretes', 'Manillas'] },
+    ],
+  };
 
-  // Preview / imagen
+  // =========================
+  // Crear (form superior)
+  // =========================
+  form: ProductoForm = this.nuevoForm();
   fileSeleccionado: File | null = null;
   imagenPreviewLocal: string | null = null;
 
-  // Filtros de admin (opcionales)
+  // Validaciones visuales (crear)
+  submittedCrear = false;
+  errorsCrear: Partial<Record<keyof ProductoForm, string>> = {};
+
+  // =========================
+  // Modal editar (pro)
+  // =========================
+  modalOpen = false;
+  modalClosing = false; // para animación de cierre real
+  editandoId: string | null = null;
+  editForm: ProductoForm = this.nuevoForm();
+
+  editFile: File | null = null;
+  editPreviewLocal: string | null = null;
+
+  // Validaciones visuales (editar)
+  submittedEditar = false;
+  errorsEditar: Partial<Record<keyof ProductoForm, string>> = {};
+
+  // =========================
+  // Filtros admin
+  // =========================
   filtroCategoria: CategoriaSlug | 'todas' = 'todas';
   busqueda = '';
 
-  form: ProductoForm = this.nuevoForm();
-
   ngOnInit(): void {
     this.cargarProductos();
+    this.inicializarSelectsCrear();
+  }
+
+  // Modal visible mientras abre o cierra (para animación)
+  get modalVisible() {
+    return this.modalOpen || this.modalClosing;
   }
 
   // =========================
-  // FORM
+  // Helpers catálogo
+  // =========================
+  getGrupos(categoria: CategoriaSlug) {
+    return this.catalogo[categoria] ?? [];
+  }
+
+  getSubgrupos(categoria: CategoriaSlug, grupo: string) {
+    const g = this.getGrupos(categoria).find(x => x.nombre === grupo);
+    return g?.items ?? [];
+  }
+
+  // =========================
+  // Form create
   // =========================
   nuevoForm(): ProductoForm {
     return {
@@ -82,15 +145,38 @@ export class Admin implements OnInit {
     };
   }
 
-  limpiarFormulario() {
-    this.editandoId = null;
+  inicializarSelectsCrear() {
+    const grupos = this.getGrupos(this.form.categoria);
+    this.form.grupo = grupos[0]?.nombre ?? '';
+    const subs = this.getSubgrupos(this.form.categoria, this.form.grupo);
+    this.form.subgrupo = subs[0] ?? '';
+  }
+
+  onCategoriaChangeCrear() {
+    const grupos = this.getGrupos(this.form.categoria);
+    this.form.grupo = grupos[0]?.nombre ?? '';
+    const subs = this.getSubgrupos(this.form.categoria, this.form.grupo);
+    this.form.subgrupo = subs[0] ?? '';
+  }
+
+  onGrupoChangeCrear() {
+    const subs = this.getSubgrupos(this.form.categoria, this.form.grupo);
+    this.form.subgrupo = subs[0] ?? '';
+  }
+
+  limpiarFormularioCrear() {
     this.form = this.nuevoForm();
     this.fileSeleccionado = null;
     this.imagenPreviewLocal = null;
+    this.inicializarSelectsCrear();
+
+    // reset validación visual
+    this.submittedCrear = false;
+    this.errorsCrear = {};
   }
 
   // =========================
-  // LISTAR
+  // Listar productos
   // =========================
   async cargarProductos() {
     this.loading = true;
@@ -105,7 +191,6 @@ export class Admin implements OnInit {
     }
 
     if (this.busqueda.trim()) {
-      // ilike para buscar en nombre
       query = query.ilike('nombre', `%${this.busqueda.trim()}%`);
     }
 
@@ -122,18 +207,32 @@ export class Admin implements OnInit {
     this.loading = false;
   }
 
+  async aplicarFiltro() {
+    await this.cargarProductos();
+  }
+
   // =========================
-  // IMAGEN
+  // Imagen (create)
   // =========================
-  onFileChange(event: Event) {
+  onFileChangeCrear(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
     this.fileSeleccionado = file;
-
-    // preview local
     this.imagenPreviewLocal = URL.createObjectURL(file);
+  }
+
+  // =========================
+  // Imagen (edit)
+  // =========================
+  onFileChangeEditar(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.editFile = file;
+    this.editPreviewLocal = URL.createObjectURL(file);
   }
 
   async subirImagenAStorage(file: File) {
@@ -167,91 +266,97 @@ export class Admin implements OnInit {
   }
 
   // =========================
-  // CREAR / ACTUALIZAR
+  // Validación visual (errors por campo)
   // =========================
-  private validarForm(): string | null {
-    if (!this.form.nombre.trim()) return 'El nombre es obligatorio.';
-    if (this.form.precio == null || this.form.precio <= 0) return 'El precio debe ser mayor a 0.';
-    if (!this.form.categoria) return 'La categoría es obligatoria.';
-    if (!this.form.grupo.trim()) return 'El grupo es obligatorio.';
-    if (!this.form.subgrupo.trim()) return 'El subgrupo es obligatorio.';
+  private buildErrors(f: ProductoForm): Partial<Record<keyof ProductoForm, string>> {
+    const e: Partial<Record<keyof ProductoForm, string>> = {};
 
-    if (this.form.en_oferta) {
-      if (this.form.precio_antes == null || this.form.precio_antes <= this.form.precio) {
-        return 'Si está en oferta, el precio anterior debe ser mayor que el precio actual.';
-      }
+    if (!f.nombre?.trim()) e.nombre = 'El nombre es obligatorio.';
+    if (f.precio == null || f.precio <= 0) e.precio = 'El precio debe ser mayor a 0.';
+    if (!f.categoria) e.categoria = 'La categoría es obligatoria.';
+    if (!f.grupo) e.grupo = 'El grupo es obligatorio.';
+    if (!f.subgrupo) e.subgrupo = 'El subgrupo es obligatorio.';
+
+    if (f.en_oferta) {
+      if (f.precio_antes == null) e.precio_antes = 'El precio antes es obligatorio si está en oferta.';
+      else if ((f.precio ?? 0) >= f.precio_antes) e.precio_antes = 'El precio anterior debe ser mayor al actual.';
     }
 
-    return null;
+    return e;
   }
 
-  async guardar() {
-    const errorValidacion = this.validarForm();
-    if (errorValidacion) {
-      alert(errorValidacion);
+  private hasErrors(e: object) {
+    return Object.keys(e).length > 0;
+  }
+
+  private focusFirstInvalid() {
+    // intenta enfocar el primer input/select/textarea marcado como invalid
+    setTimeout(() => {
+      const el = document.querySelector('.field.invalid input, .field.invalid select, .field.invalid textarea') as HTMLElement | null;
+      if (el) el.focus();
+    }, 0);
+  }
+
+  // =========================
+  // CREATE
+  // =========================
+  async crearProducto() {
+    this.submittedCrear = true;
+    this.errorsCrear = this.buildErrors(this.form);
+
+    if (this.hasErrors(this.errorsCrear)) {
+      this.focusFirstInvalid();
       return;
     }
 
     this.saving = true;
 
-    // 1) si hay archivo seleccionado, lo subimos y seteamos url pública
+    // subir imagen si hay archivo
     if (this.fileSeleccionado) {
       const url = await this.subirImagenAStorage(this.fileSeleccionado);
       if (!url) {
-        alert('No se pudo subir la imagen.');
         this.saving = false;
-        return;
+        return alert('No se pudo subir la imagen.');
       }
       this.form.imagen = url;
     }
 
-    // 2) payload
     const payload = {
       nombre: this.form.nombre.trim(),
       descripcion: this.form.descripcion?.trim() || null,
       precio: Number(this.form.precio),
       categoria: this.form.categoria,
-      grupo: this.form.grupo.trim(),
-      subgrupo: this.form.subgrupo.trim(),
+      grupo: this.form.grupo,
+      subgrupo: this.form.subgrupo,
       imagen: this.form.imagen || null,
       es_nuevo: this.form.es_nuevo,
       en_oferta: this.form.en_oferta,
       precio_antes: this.form.en_oferta ? (this.form.precio_antes ?? null) : null,
     };
 
-    // 3) insert o update
-    if (!this.editandoId) {
-      const { error } = await supabase.from('productos').insert(payload);
-      if (error) {
-        console.error('Error creando producto:', error);
-        alert('❌ Error creando producto: ' + error.message);
-        this.saving = false;
-        return;
-      }
-      alert('✅ Producto creado');
-    } else {
-      const { error } = await supabase.from('productos').update(payload).eq('id', this.editandoId);
-      if (error) {
-        console.error('Error actualizando producto:', error);
-        alert('❌ Error actualizando: ' + error.message);
-        this.saving = false;
-        return;
-      }
-      alert('✅ Producto actualizado');
+    const { error } = await supabase.from('productos').insert(payload);
+
+    if (error) {
+      console.error('Error creando producto:', error);
+      this.saving = false;
+      return alert('❌ Error creando producto: ' + error.message);
     }
 
     this.saving = false;
-    this.limpiarFormulario();
+    alert('✅ Producto creado');
+    this.limpiarFormularioCrear();
     await this.cargarProductos();
   }
 
   // =========================
-  // EDITAR / ELIMINAR
+  // MODAL EDITAR
   // =========================
-  editar(p: Producto) {
+  abrirModalEditar(p: Producto) {
     this.editandoId = p.id;
+    this.modalOpen = true;
+    this.modalClosing = false;
 
-    this.form = {
+    this.editForm = {
       nombre: p.nombre || '',
       descripcion: (p.descripcion ?? '') as string,
       precio: p.precio ?? null,
@@ -264,13 +369,108 @@ export class Admin implements OnInit {
       precio_antes: p.precio_antes ?? null,
     };
 
-    this.fileSeleccionado = null;
-    this.imagenPreviewLocal = null;
+    // acomodar al catálogo
+    const grupos = this.getGrupos(this.editForm.categoria);
+    if (!grupos.find(g => g.nombre === this.editForm.grupo)) {
+      this.editForm.grupo = grupos[0]?.nombre ?? '';
+    }
+    const subs = this.getSubgrupos(this.editForm.categoria, this.editForm.grupo);
+    if (!subs.includes(this.editForm.subgrupo)) {
+      this.editForm.subgrupo = subs[0] ?? '';
+    }
 
-    // subir a la parte de arriba (form)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.editFile = null;
+    this.editPreviewLocal = null;
+
+    // reset validación
+    this.submittedEditar = false;
+    this.errorsEditar = {};
   }
 
+  cerrarModal() {
+    if (!this.modalOpen || this.modalClosing) return;
+
+    // activa animación cierre
+    this.modalClosing = true;
+
+    // después de animación, realmente lo escondes
+    setTimeout(() => {
+      this.modalOpen = false;
+      this.modalClosing = false;
+      this.editandoId = null;
+      this.editFile = null;
+      this.editPreviewLocal = null;
+
+      this.submittedEditar = false;
+      this.errorsEditar = {};
+    }, 160); // debe calzar con CSS popOut/fadeOut (0.16s)
+  }
+
+  onCategoriaChangeEditar() {
+    const grupos = this.getGrupos(this.editForm.categoria);
+    this.editForm.grupo = grupos[0]?.nombre ?? '';
+    const subs = this.getSubgrupos(this.editForm.categoria, this.editForm.grupo);
+    this.editForm.subgrupo = subs[0] ?? '';
+  }
+
+  onGrupoChangeEditar() {
+    const subs = this.getSubgrupos(this.editForm.categoria, this.editForm.grupo);
+    this.editForm.subgrupo = subs[0] ?? '';
+  }
+
+  async guardarEdicion() {
+    if (!this.editandoId) return;
+
+    this.submittedEditar = true;
+    this.errorsEditar = this.buildErrors(this.editForm);
+
+    if (this.hasErrors(this.errorsEditar)) {
+      this.focusFirstInvalid();
+      return;
+    }
+
+    this.saving = true;
+
+    // subir imagen si cambió
+    if (this.editFile) {
+      const url = await this.subirImagenAStorage(this.editFile);
+      if (!url) {
+        this.saving = false;
+        return alert('No se pudo subir la imagen.');
+      }
+      this.editForm.imagen = url;
+    }
+
+    const payload = {
+      nombre: this.editForm.nombre.trim(),
+      descripcion: this.editForm.descripcion?.trim() || null,
+      precio: Number(this.editForm.precio),
+      categoria: this.editForm.categoria,
+      grupo: this.editForm.grupo,
+      subgrupo: this.editForm.subgrupo,
+      imagen: this.editForm.imagen || null,
+      es_nuevo: this.editForm.es_nuevo,
+      en_oferta: this.editForm.en_oferta,
+      precio_antes: this.editForm.en_oferta ? (this.editForm.precio_antes ?? null) : null,
+    };
+
+    const { error } = await supabase.from('productos').update(payload).eq('id', this.editandoId);
+
+    if (error) {
+      console.error('Error actualizando producto:', error);
+      this.saving = false;
+      return alert('❌ Error actualizando: ' + error.message);
+    }
+
+    this.saving = false;
+    alert('✅ Producto actualizado');
+    this.cerrarModal();
+    await this.cargarProductos();
+  }
+
+  // =========================
+  // DELETE
+  // =========================
   async eliminar(p: Producto) {
     const ok = confirm(`¿Eliminar "${p.nombre}"?`);
     if (!ok) return;
@@ -278,19 +478,11 @@ export class Admin implements OnInit {
     const { error } = await supabase.from('productos').delete().eq('id', p.id);
 
     if (error) {
-      console.error('Error eliminando:', error);
-      alert('❌ Error eliminando: ' + error.message);
-      return;
+      console.error('Error eliminando producto:', error);
+      return alert('❌ Error eliminando: ' + error.message);
     }
 
     alert('✅ Producto eliminado');
-    await this.cargarProductos();
-  }
-
-  // =========================
-  // UI helpers
-  // =========================
-  async aplicarFiltro() {
     await this.cargarProductos();
   }
 }
