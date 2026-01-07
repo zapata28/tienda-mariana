@@ -325,10 +325,9 @@ export class Categoria implements OnInit {
   // NAV
   // =========================
   verProducto(id: string) {
-    console.log('Producto:', id);
-    // this.router.navigate(['/producto', id]);
+  this.router.navigate(['/producto', id]);
   }
-    // =========================
+
   // CARRITO
   // =========================
   addToCart(p: Producto) {
