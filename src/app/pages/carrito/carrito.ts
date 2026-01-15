@@ -21,8 +21,10 @@ export class CarritoComponent {
   cliente = {
     nombre: '',
     direccion: '',
+    ciudad: '',
     correo: '',
     telefono: '',
+    pago: '', // Nequi | Daviplata
   };
 
   // ===== TOTALES =====
@@ -50,13 +52,17 @@ export class CarritoComponent {
     const msg =
 `Hola 👋 Quiero hacer este pedido:
 
-👤 DATOS DEL CLIENTE
+👤 *DATOS DEL CLIENTE*
 Nombre: ${this.cliente.nombre}
 Dirección: ${this.cliente.direccion}
+Ciudad: ${this.cliente.ciudad}
 Correo: ${this.cliente.correo}
 Teléfono: ${this.cliente.telefono}
 
-🛒 PEDIDO
+💳 *MÉTODO DE PAGO*
+${this.cliente.pago}
+
+🛒 *PEDIDO*
 ${lineas.join('\n')}
 
 Subtotal: ${this.money(this.subtotal)}
@@ -69,13 +75,17 @@ Total: ${this.money(this.total)}
   }
 
   finalizarWhatsApp() {
+    const c = this.cliente;
+
     if (
-      !this.cliente.nombre ||
-      !this.cliente.direccion ||
-      !this.cliente.correo ||
-      !this.cliente.telefono
+      !c.nombre ||
+      !c.direccion ||
+      !c.ciudad ||
+      !c.correo ||
+      !c.telefono ||
+      !c.pago
     ) {
-      alert('Por favor completa todos los datos para continuar');
+      alert('Por favor completa todos los datos del pedido');
       return;
     }
 

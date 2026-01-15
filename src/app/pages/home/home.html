@@ -11,7 +11,7 @@
     *ngFor="let slide of slides; let i = index"
     [class.active]="i === currentSlide"
   >
-    <!-- ✅ Imagen real (mejor performance) -->
+ 
     <img
       class="slide-bg"
       [src]="slide.image"

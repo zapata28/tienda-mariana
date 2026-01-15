@@ -83,5 +83,152 @@
         </button>
       </div>
     </div>
+  </div><section class="carrito">
+  <div class="top">
+    <h1>Carrito</h1>
+
+    <button
+      class="btn ghost"
+      *ngIf="cart.itemsSig().length"
+      (click)="cart.clear()"
+    >
+      Vaciar
+    </button>
   </div>
+
+  <div class="carrito-vacio" *ngIf="cart.itemsSig().length === 0">
+    Tu carrito está vacío.
+  </div>
+
+  <div class="lista" *ngIf="cart.itemsSig().length">
+    <div class="item" *ngFor="let it of cart.itemsSig()">
+      <div class="info">
+        <div class="name">{{ it.nombre }}</div>
+        <div class="price">{{ money(it.precio) }}</div>
+      </div>
+
+      <div class="qty">
+        <button (click)="cart.setQty(it.id, it.qty - 1)">−</button>
+        <input
+          type="number"
+          min="1"
+          [value]="it.qty"
+          (change)="cart.setQty(it.id, $any($event.target).value)"
+        />
+        <button (click)="cart.setQty(it.id, it.qty + 1)">+</button>
+      </div>
+
+      <div class="line-total">
+        {{ money(it.precio * it.qty) }}
+      </div>
+
+      <button class="btn danger" (click)="cart.remove(it.id)">
+        Quitar
+      </button>
+    </div>
+
+    <!-- RESUMEN -->
+    <div class="resumen">
+      <div class="row">
+        <span>Subtotal</span>
+        <strong>{{ money(subtotal) }}</strong>
+      </div>
+
+      <div class="row envio">
+        <span>
+          Envío
+          <small *ngIf="subtotal < envioGratisDesde">
+            (Gratis desde {{ money(envioGratisDesde) }})
+          </small>
+          <small class="free" *ngIf="subtotal >= envioGratisDesde">GRATIS</small>
+        </span>
+
+        <strong>{{ envio === 0 ? 'Gratis' : money(envio) }}</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row total">
+        <span>Total</span>
+        <strong>{{ money(total) }}</strong>
+      </div>
+
+      <!-- FORMULARIO -->
+      <div class="checkout-form">
+        <h3>Datos para el pedido</h3>
+
+        <input
+          type="text"
+          placeholder="Nombre completo *"
+          [(ngModel)]="cliente.nombre"
+          required
+        >
+
+        <input
+          type="text"
+          placeholder="Dirección *"
+          [(ngModel)]="cliente.direccion"
+          required
+        >
+
+        <input
+          type="text"
+          placeholder="Ciudad *"
+          [(ngModel)]="cliente.ciudad"
+          required
+        >
+
+        <input
+          type="email"
+          placeholder="Correo electrónico *"
+          [(ngModel)]="cliente.correo"
+          required
+        >
+
+        <input
+          type="tel"
+          placeholder="Teléfono *"
+          [(ngModel)]="cliente.telefono"
+          required
+        >
+
+        <!-- MÉTODO DE PAGO -->
+        <div class="payment">
+          <label>Método de pago *</label>
+
+          <label class="radio">
+            <input
+              type="radio"
+              name="pago"
+              value="Nequi"
+              [(ngModel)]="cliente.pago"
+            >
+            Nequi
+          </label>
+
+          <label class="radio">
+            <input
+              type="radio"
+              name="pago"
+              value="Daviplata"
+              [(ngModel)]="cliente.pago"
+            >
+            Daviplata
+          </label>
+        </div>
+      </div>
+
+      <div class="cta">
+        <button
+          class="btn whatsapp"
+          type="button"
+          (click)="finalizarWhatsApp()"
+        >
+          Finalizar por WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 </section>
