@@ -24,25 +24,38 @@ export type Producto = {
 export class ProductService {
   constructor(private cache: ProductCacheService) {}
 
-  async getByCategoria(slug: CategoriaSlug): Promise<Producto[]> {
-    const key = `categoria_${slug}`;
-    const cached = this.cache.get<Producto[]>(key);
+  async getByCategoria(
+    slug: CategoriaSlug,
+    page = 1,
+    pageSize = 12
+  ): Promise<{ data: Producto[]; total: number }> {
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    const cacheKey = `categoria_${slug}_${page}_${pageSize}`;
+    const cached =
+      this.cache.get<{ data: Producto[]; total: number }>(cacheKey);
 
     if (cached) return cached;
 
-    const { data, error } = await supabase
+    const { data, count, error } = await supabase
       .from('productos')
-      .select('*')
+      .select('*', { count: 'exact' })
       .eq('categoria', slug)
       .order('created_at', { ascending: false })
-      .limit(20);
+      .range(from, to);
 
     if (error) {
       console.error('Error cargando productos', error);
-      return [];
+      return { data: [], total: 0 };
     }
 
-    this.cache.set(key, data ?? []);
-    return data ?? [];
+    const result = {
+      data: data ?? [],
+      total: count ?? 0,
+    };
+
+    this.cache.set(cacheKey, result);
+    return result;
   }
 }

@@ -1,22 +1,25 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../auth/auth';
 import { CartService } from '../../cart.service';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
 })
 export class HeaderComponent {
 
   // Estados de UI
-  menuOpen = false;       // menú categorías
-  cartOpen = false;       // mini carrito
-  userMenuOpen = false;  // menú usuario (👤)
+  menuOpen: boolean = false;
+  cartOpen: boolean = false;
+  userMenuOpen: boolean = false;
 
   constructor(
     public auth: Auth,
@@ -27,7 +30,7 @@ export class HeaderComponent {
   /* ===============================
      SESIÓN
   ================================ */
-  async salir() {
+  async salir(): Promise<void> {
     await this.auth.logout();
     this.router.navigate(['/']);
     this.closeAll();
@@ -36,7 +39,7 @@ export class HeaderComponent {
   /* ===============================
      MENÚ CATEGORÍAS
   ================================ */
-  toggleMenu() {
+  toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
 
     if (this.menuOpen) {
@@ -45,14 +48,14 @@ export class HeaderComponent {
     }
   }
 
-  closeMenu() {
+  closeMenu(): void {
     this.menuOpen = false;
   }
 
   /* ===============================
      CARRITO
   ================================ */
-  toggleCart() {
+  toggleCart(): void {
     this.cartOpen = !this.cartOpen;
 
     if (this.cartOpen) {
@@ -61,14 +64,14 @@ export class HeaderComponent {
     }
   }
 
-  closeCart() {
+  closeCart(): void {
     this.cartOpen = false;
   }
 
   /* ===============================
-     MENÚ USUARIO (👤)
+     MENÚ USUARIO
   ================================ */
-  toggleUserMenu() {
+  toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
 
     if (this.userMenuOpen) {
@@ -77,14 +80,14 @@ export class HeaderComponent {
     }
   }
 
-  closeUserMenu() {
+  closeUserMenu(): void {
     this.userMenuOpen = false;
   }
 
   /* ===============================
-     CERRAR TODO (overlay / navegación)
+     CERRAR TODO
   ================================ */
-  closeAll() {
+  closeAll(): void {
     this.menuOpen = false;
     this.cartOpen = false;
     this.userMenuOpen = false;

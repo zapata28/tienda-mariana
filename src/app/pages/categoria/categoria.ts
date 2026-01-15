@@ -1,24 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { supabase } from '../../supabase.client';
 import { CartService } from '../../cart.service';
-
-type CategoriaSlug = 'maquillaje' | 'skincare' | 'capilar' | 'accesorios';
-
-type Producto = {
-  id: string;
-  nombre: string;
-  descripcion?: string | null;
-  precio: number;
-  categoria: CategoriaSlug;
-  grupo?: string | null;
-  subgrupo?: string | null;
-  imagen?: string | null;
-  es_nuevo?: boolean | null;
-  en_oferta?: boolean | null;
-  precio_antes?: number | null;
-};
+import {
+  ProductService,
+  CategoriaSlug,
+  Producto,
+} from '../../services/product.service';
 
 @Component({
   selector: 'app-categoria',
@@ -28,7 +16,6 @@ type Producto = {
   styleUrls: ['./categoria.css'],
 })
 export class Categoria implements OnInit {
-
   slugActual!: CategoriaSlug;
   titulo = '';
 
@@ -52,35 +39,48 @@ export class Categoria implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private cart: CartService
+    private cart: CartService,
+    private productService: ProductService
   ) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     this.route.paramMap.subscribe(async params => {
-      this.slugActual = params.get('slug') as CategoriaSlug;
+      const slug = params.get('slug') as CategoriaSlug;
+
+      if (!slug) {
+        this.router.navigate(['/']);
+        return;
+      }
+
+      this.slugActual = slug;
       this.setTitulo();
       this.setGrupos();
       this.page = 1;
+
       await this.cargarProductos();
     });
   }
 
   setTitulo() {
-    const map: any = {
+    const map: Record<CategoriaSlug, string> = {
       maquillaje: 'Maquillaje',
       skincare: 'Cuidado de la piel',
       capilar: 'Cuidado capilar',
-      accesorios: 'Accesorios'
+      accesorios: 'Accesorios',
     };
     this.titulo = map[this.slugActual];
   }
 
   setGrupos() {
+    this.grupoActivo = 'Todos';
+    this.subitemActivo = 'Todos';
+    this.subitems = [];
+
     if (this.slugActual === 'maquillaje') {
       this.grupos = [
         { nombre: 'Rostro', items: ['Bases', 'Correctores', 'Polvos'] },
         { nombre: 'Ojos', items: ['Sombras', 'Pestañinas'] },
-        { nombre: 'Labios', items: ['Labiales', 'Brillos'] }
+        { nombre: 'Labios', items: ['Labiales', 'Brillos'] },
       ];
     } else {
       this.grupos = [];
@@ -90,38 +90,28 @@ export class Categoria implements OnInit {
   async cargarProductos() {
     this.loading = true;
 
-    const from = (this.page - 1) * this.pageSize;
-    const to = from + this.pageSize - 1;
+    const { data, total } =
+      await this.productService.getByCategoria(
+        this.slugActual,
+        this.page,
+        this.pageSize
+      );
 
-    let query = supabase
-      .from('productos')
-      .select('*', { count: 'exact' })
-      .eq('categoria', this.slugActual)
-      .order('created_at', { ascending: false });
-
-    if (this.grupoActivo !== 'Todos') {
-      query = query.eq('grupo', this.grupoActivo);
-    }
-
-    if (this.subitemActivo !== 'Todos') {
-      query = query.eq('subgrupo', this.subitemActivo);
-    }
-
-    const { data, count } = await query.range(from, to);
-
-    this.productos = data ?? [];
-    this.total = count ?? 0;
+    this.productos = data;
+    this.total = total;
     this.totalPages = Math.max(1, Math.ceil(this.total / this.pageSize));
-    this.recalcularPaginas();
 
+    this.recalcularPaginas();
     this.actualizarBreadcrumbs();
+
     this.loading = false;
   }
 
   recalcularPaginas() {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages; i++) pages.push(i);
-    this.paginasVisibles = pages;
+    this.paginasVisibles = [];
+    for (let i = 1; i <= this.totalPages; i++) {
+      this.paginasVisibles.push(i);
+    }
   }
 
   async seleccionarGrupo(nombre: string) {
@@ -163,15 +153,21 @@ export class Categoria implements OnInit {
   actualizarBreadcrumbs() {
     this.breadcrumbs = [
       { label: 'Inicio', action: 'home' },
-      { label: this.titulo, action: 'categoria' }
+      { label: this.titulo, action: 'categoria' },
     ];
 
     if (this.grupoActivo !== 'Todos') {
-      this.breadcrumbs.push({ label: this.grupoActivo, action: 'grupo' });
+      this.breadcrumbs.push({
+        label: this.grupoActivo,
+        action: 'grupo',
+      });
     }
 
     if (this.subitemActivo !== 'Todos') {
-      this.breadcrumbs.push({ label: this.subitemActivo, action: 'subitem' });
+      this.breadcrumbs.push({
+        label: this.subitemActivo,
+        action: 'subitem',
+      });
     }
   }
 

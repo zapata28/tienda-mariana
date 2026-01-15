@@ -1,19 +1,33 @@
 import { Routes } from '@angular/router';
-import { Home } from './pages/home/home';
-import { Categoria } from './pages/categoria/categoria';
-import { Login } from './pages/login/login';
-import { Admin } from './pages/admin/admin';
 import { authGuard } from './auth/auth-guard';
 import { noAuthGuard } from './auth/no-auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: Home },
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/home/home').then(m => m.Home),
+  },
 
-  { path: 'categoria/:slug', component: Categoria },
+  {
+    path: 'categoria/:slug',
+    loadComponent: () =>
+      import('./pages/categoria/categoria').then(m => m.Categoria),
+  },
 
-  { path: 'login', component: Login, canActivate: [noAuthGuard] },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login').then(m => m.Login),
+    canActivate: [noAuthGuard],
+  },
 
-  { path: 'admin', component: Admin, canActivate: [authGuard] },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./pages/admin/admin').then(m => m.Admin),
+    canActivate: [authGuard],
+  },
 
   {
     path: 'carrito',
