@@ -1,3 +1,10 @@
+:root {
+  --marron-principal: #7f5539;
+  --marron-hover: #9c6644;
+  --marron-claro: #b08968;
+  --beige-suave: #ddb892;
+  --texto-principal: #000000;
+}
 /* ===============================
    CATEGORIA PAGE (BASE)
 ================================ */
@@ -9,7 +16,7 @@
 
 .categoria-page h1 {
   font-size: 32px;
-  color: var(--texto-principal);
+  color: var(--beige-suave);
   margin-bottom: 16px;
 }
 
@@ -28,7 +35,7 @@
 .crumb{
   border: none;
   background: transparent;
-  color: rgba(0,0,0,0.65);
+  color: var(--marron-principal);
   font-weight: 800;
   font-size: 13px;
   cursor: pointer;
@@ -36,12 +43,12 @@
 }
 
 .crumb:hover{
-  color: var(--verde-principal);
+  color: var(--marron-principal);
   text-decoration: underline;
 }
 
 .crumb.last{
-  color: var(--texto-principal);
+  color: var(--marron-principal);
   cursor: default;
   text-decoration: none;
 }
@@ -51,7 +58,7 @@
 }
 
 .sep{
-  color: rgba(0,0,0,0.35);
+  color: var(--marron-principal);
   font-weight: 900;
 }
 
@@ -60,8 +67,8 @@
 ================================ */
 /* Caja de chips */
 .chips-box {
-  background: rgba(47,125,90,0.06);
-  border: 1px solid rgba(47,125,90,0.12);
+  background: #b0886869;
+  border: 1px solid var(--marron-principal);
   border-radius: 14px;
   padding: 12px;
   margin-bottom: 14px;
@@ -70,7 +77,7 @@
 .chips-title {
   font-weight: 900;
   font-size: 13px;
-  color: var(--texto-principal);
+  color: var(--beige-suave);
   margin-bottom: 10px;
 }
 
@@ -85,7 +92,7 @@
 .chip {
   border: 1px solid rgba(47, 125, 90, 0.25);
   background: #fff;
-  color: var(--texto-principal);
+  color: var(--marron-principal);
   padding: 9px 14px;
   border-radius: 999px;
   font-weight: 800;
@@ -97,12 +104,12 @@
 
 .chip:hover {
   transform: translateY(-1px);
-  border-color: rgba(47,125,90,0.45);
+  border-color: var(--marron-hover);
 }
 
 .chip.active {
-  background: var(--verde-principal);
-  border-color: var(--verde-principal);
+  background: var(--marron-principal);
+  border-color: var(--marron-principal);
   color: #fff;
 }
 
@@ -147,50 +154,77 @@
    PRODUCT CARD (FALTABA)
 ================================ */
 .producto-card{
-  background: #fff;
-  border-radius: 16px;
+  background: #f0dfcd;
+  border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0,0,0,0.08);
   border: 1px solid rgba(0,0,0,0.05);
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  transition: transform .15s ease, box-shadow .2s ease;
+  position: relative;
 }
 
-.producto-card:hover{
+
+.producto-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 22px rgba(0,0,0,0.12);
 }
 
-/* Imagen contenedor */
+/* CONTENEDOR DE IMAGEN */
 .producto-img{
-  position: relative;
   width: 100%;
-  height: 190px; /* ✅ mismo tamaño todas */
-  background: #f3f5f4;
+  height: 210px;            /* 🔥 un poco más alta */
+  margin: 14px 12px 0;     /* aire lateral y arriba */
+
+  background: #f7efe6;     /* beige suave, no gris */
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;           /* separación real */
+  overflow: hidden;
 }
 
+/* IMAGEN */
 .producto-img img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* ✅ no se deforma */
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
 }
+
+
+
+/* HOVER SUAVE (opcional) */
+.producto-card:hover .producto-img img {
+  transform: scale(1.05);
+}
+
+
+/* EFECTO HOVER IMAGEN */
+.producto-card:hover .producto-img img {
+  transform: scale(1.05);
+}
+
 
 /* Badges */
 .badge{
   position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 6px 10px;
+  top: 18px;
+  left: 18px;
+  padding: 6px 12px;
   border-radius: 999px;
   font-weight: 900;
   font-size: 12px;
   color: #fff;
-  background: var(--verde-principal);
+  background: var(--marron-principal);
   box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+  z-index: 3;
 }
+
 
 .badge-oferta{
   left: auto;
@@ -204,11 +238,13 @@
 
 /* Info */
 .producto-info{
-  padding: 12px 12px 14px;
+  padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  flex: 1;                 /* 🔥 empuja precio abajo */
 }
+
 
 .producto-info h3{
   margin: 0;
@@ -228,12 +264,12 @@
 
 /* Precio y botón */
 .precio-row{
-  display:flex;
-  align-items:center;
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 6px;
+  margin-top: auto;        /* 🔥 se pega abajo */
 }
+
 
 .precios{
   display:flex;
