@@ -1,8 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { supabase } from '../../supabase.client';
 import { CartService } from '../../cart.service';
+import { supabase } from '../../supabase.client';
 import { Subscription } from 'rxjs';
 
 type CategoriaSlug = 'maquillaje' | 'skincare' | 'capilar' | 'accesorios';
@@ -38,23 +38,23 @@ export class ProductoComponent implements OnInit, OnDestroy {
 
   private sub?: Subscription;
 
-constructor(
-  private route: ActivatedRoute,
-  private router: Router,
-  private cart: CartService
-) {
-  // 👇 ESTA LÍNEA ES LA CLAVE REAL
-  this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private cart: CartService,
+    private cdr: ChangeDetectorRef // 👈 MISMO FIX QUE CATEGORÍA
+  ) {}
 
-
-  // ✅ FIX REAL (igual que categorías)
   ngOnInit(): void {
-    this.sub = this.router.events.subscribe(async () => {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        await this.cargarProducto(id);
+    this.sub = this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+
+      if (!id) {
+        this.router.navigate(['/']);
+        return;
       }
+
+      this.cargarProducto(id);
     });
   }
 
@@ -62,49 +62,71 @@ constructor(
     this.sub?.unsubscribe();
   }
 
+  /* =======================
+     CARGAR PRODUCTO
+  ======================= */
   async cargarProducto(id: string) {
     this.loading = true;
     this.loadingRelacionados = true;
+    this.producto = null;
 
-    const { data, error } = await supabase
-      .from('productos')
-      .select('*')
-      .eq('id', id)
-      .single();
+    this.cdr.detectChanges(); // 🔥
 
-    if (error) {
-      console.error('Error cargando producto:', error);
+    try {
+      const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      this.producto = data as ProductoModel;
+      this.loading = false;
+
+      this.cdr.detectChanges(); // 🔥
+
+      await this.cargarRelacionados(
+        this.producto.categoria,
+        this.producto.id
+      );
+    } catch (err) {
+      console.error('Error cargando producto', err);
       this.producto = null;
       this.loading = false;
       this.loadingRelacionados = false;
-      return;
+      this.cdr.detectChanges();
     }
-
-    this.producto = data as ProductoModel;
-    this.loading = false;
-
-    await this.cargarRelacionados(this.producto.categoria, this.producto.id);
   }
 
+  /* =======================
+     RELACIONADOS
+  ======================= */
   async cargarRelacionados(categoria: CategoriaSlug, actualId: string) {
-    const { data, error } = await supabase
-      .from('productos')
-      .select('*')
-      .eq('categoria', categoria)
-      .neq('id', actualId)
-      .order('created_at', { ascending: false })
-      .limit(8);
+    try {
+      const { data, error } = await supabase
+        .from('productos')
+        .select('*')
+        .eq('categoria', categoria)
+        .neq('id', actualId)
+        .order('created_at', { ascending: false })
+        .limit(8);
 
-    if (error) {
-      console.error('Error relacionados:', error);
-      this.relacionados = [];
-    } else {
+      if (error) throw error;
+
       this.relacionados = data as ProductoModel[];
+    } catch (err) {
+      console.error('Error relacionados', err);
+      this.relacionados = [];
+    } finally {
+      this.loadingRelacionados = false;
+      this.cdr.detectChanges(); // 🔥
     }
-
-    this.loadingRelacionados = false;
   }
 
+  /* =======================
+     UTILIDADES
+  ======================= */
   descuentoPct(p: ProductoModel): number {
     const antes = Number(p.precio_antes);
     const ahora = Number(p.precio);
@@ -129,6 +151,9 @@ constructor(
   }
 
   volver() {
-    this.router.navigate(['/categoria', this.producto?.categoria ?? 'maquillaje']);
+    this.router.navigate([
+      '/categoria',
+      this.producto?.categoria ?? 'maquillaje',
+    ]);
   }
 }
