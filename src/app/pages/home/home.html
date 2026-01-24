@@ -68,14 +68,19 @@
       <div class="producto-info">
         <h3>{{ p.nombre }}</h3>
 
+        <p class="desc" *ngIf="p.descripcion">
+          {{ p.descripcion }}
+        </p>
+
+
         <div class="precio-row">
           <div class="precios">
             <span class="precio">
-              {{ p.precio | currency:'COP':'symbol':'1.0-0' }}
+              {{ p.precio | currency:'$  ':'symbol':'1.0-0' }}
             </span>
 
             <span class="precio-antes" *ngIf="p.precio_antes">
-              {{ p.precio_antes | currency:'COP':'symbol':'1.0-0' }}
+              {{ p.precio_antes | currency:'$  ':'symbol':'1.0-0' }}
             </span>
           </div>
 
@@ -150,7 +155,7 @@
 
         <div class="precio-row">
           <span class="precio">
-            {{ p.precio | currency:'COP':'symbol':'1.0-0' }}
+            {{ p.precio | currency:'$  ':'symbol':'1.0-0' }}
           </span>
         </div>
       </div>

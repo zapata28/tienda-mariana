@@ -152,25 +152,7 @@ transition: all .2s ease;
   padding: 8px 12px;
 }
 
-/* MOBILE: chips con scroll horizontal */
-@media (max-width: 600px) {
-  .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
-    flex: 0 0 auto;
-  }
 
-  .chips::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .chips::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.15);
-    border-radius: 99px;
-  }
-}
 
 /* ===============================
    GRID PRODUCTOS
@@ -287,22 +269,29 @@ transition: all .2s ease;
 
 .precio-row{
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  margin-top: auto;
+  gap: 8px;
+}
+
+
+.precio,
+.precio-antes{
+  display: block;
 }
 
 .precio{
+  font-size: 13px;
   font-weight: 900;
-  color: var(--marron-principal);
-  font-size: 14px;
+  line-height: 1.2;
 }
 
 .precio-antes{
-  font-size: 12px;
-  color: rgba(0,0,0,0.45);
-  text-decoration: line-through;
-  font-weight: 800;
+  font-size: 10.5px;
+  margin-top: 2px;
+  text-decoration: line-through;   /* 👈 FORZADO */
+  text-decoration-thickness: 1.5px;
+  text-decoration-color:var(--marron-principal);
 }
 
 /* ===============================
@@ -382,17 +371,7 @@ transition: all .2s ease;
   margin-left: 6px;
 }
 
-@media (max-width:600px){
-  .pag-num, .pag-btn{
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-  }
 
-  .producto-img{
-    height: 170px; /* un poco más bajito en móvil */
-  }
-}
 /* ===============================
    ACCIONES (AGREGAR + VER)
 ================================ */
@@ -423,20 +402,7 @@ transition: all .2s ease;
 }
 
 /* En móvil: que los botones no se aplasten */
-@media (max-width: 420px){
-  .precio-row{
-    align-items: flex-end;
-  }
-  .acciones{
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .btn-add,
-  .btn-ver{
-    width: 100%;
-    text-align: center;
-  }
-}
+
 .icons{
   display: flex;
   align-items: center;
@@ -481,3 +447,212 @@ transition: all .2s ease;
   border: 2px solid #fff;
 }
 
+
+
+
+
+
+
+/* =================================
+   MOBILE – CATEGORÍA PAGE
+================================= */
+@media (max-width: 768px) {
+
+  /* CONTENEDOR PRINCIPAL */
+  .categoria-page {
+    padding: 14px 12px 32px;
+  }
+
+  /* TÍTULOS */
+  .categoria-page h1 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .categoria-title {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  /* BREADCRUMB */
+  .breadcrumb {
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .crumb {
+    font-size: 12px;
+  }
+
+  /* BOTÓN FILTRO */
+  .filtro-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+
+  /* ===============================
+     CHIPS
+  ============================== */
+  .chips-box {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .chips-title {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 6px;
+  }
+
+  .chip {
+    padding: 7px 12px;
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+
+  /* ===============================
+     GRID PRODUCTOS
+  ============================== */
+  .productos-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  /* ===============================
+     PRODUCT CARD
+  ============================== */
+  .producto-card {
+    border-radius: 18px;
+  }
+
+  .producto-img {
+    height: 150px;
+    padding: 10px;
+    margin: 8px auto 0;
+    width: 92%;
+  }
+
+  .producto-img img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  /* BADGES */
+  .badge {
+    font-size: 10px;
+    padding: 4px 10px;
+  }
+
+  /* INFO */
+  .producto-info {
+    padding: 10px 10px 12px;
+  }
+
+  .producto-info h3 {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+
+  .producto-info .desc {
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  /* ===============================
+     PRECIO + ACCIONES (FIX CLAVE)
+  ============================== */
+.precio-row{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+
+  .precio {
+    font-size: 12.5px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .precio-antes {
+    font-size: 10px;
+  }
+
+  .acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* BOTÓN AGREGAR COMPACTO */
+  .btn-add {
+    width: auto;              /* 👈 NO 100% */
+    padding: 5px 8px;         /* 👈 MÁS PEQUEÑO */
+    font-size: 11px;
+    border-radius: 7px;
+    line-height: 1;
+  }
+
+  /* ICONOS */
+  .icons {
+    justify-content: center;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  /* ===============================
+     PAGINACIÓN
+  ============================== */
+  .paginacion {
+    gap: 8px;
+    padding: 10px;
+    margin-top: 16px;
+  }
+
+  .pag-btn,
+  .pag-num {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .pag-info {
+    font-size: 12px;
+  }
+}
+
+/* =================================
+   EXTRA SMALL (≤ 420px)
+================================= */
+@media (max-width: 420px) {
+
+  .producto-img {
+    height: 135px;
+  }
+
+  .producto-info h3 {
+    font-size: 12.5px;
+  }
+
+  .precio {
+    font-size: 12px;
+  }
+
+  .btn-add {
+    font-size: 10.5px;
+    padding: 4px 7px;
+  }
+}

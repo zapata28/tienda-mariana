@@ -116,9 +116,7 @@
   color: #ffffff !important;
 }
 
-/* ===============================
-   TÍTULOS DE SECCIÓN
-================================ */
+   /* TÍTULOS DE SECCIÓN */
 .section-title {
   margin: 14px 0 10px;
   padding: 0 18px;
@@ -132,9 +130,7 @@
   letter-spacing: 0.2px;
 }
 
-/* ===============================
-   CATEGORÍAS
-================================ */
+   /* CATEGORÍAS */
 .categoria-container {
   background-color: #ddb89274;
   border-radius: 16px;
@@ -212,9 +208,7 @@
   font-size: 14px;
 }
 
-/* ===============================
-   NOVEDADES (HORIZONTAL)
-================================ */
+   /* NOVEDADES (HORIZONTAL) */
 .novedades-container {
   margin: 6px 18px 18px;
   overflow: hidden;
@@ -294,20 +288,14 @@
   width: auto;
   height: auto;
 
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 90%;
+  max-height: 90%;
 
   display: block;
   object-fit: contain;
   object-position: center;
   padding: 10px;
   transition: transform 0.35s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .novedades-grid .producto-card:hover .producto-img img {
-    transform: scale(1.04);
-  }
 }
 
 /* Badges */
@@ -353,9 +341,10 @@
 }
 
 .novedades-grid .producto-card .producto-info .desc {
+  min-height: 32px;
   margin: 0;
   font-size: 13px;
-  color: rgba(245, 0, 0, 0.68);
+  color: var(--marron-hover);
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -363,14 +352,14 @@
   overflow: hidden;
 }
 
-/* Precio + acciones abajo siempre */
 .novedades-grid .producto-card .producto-info .precio-row {
   margin-top: auto;
   display: flex;
-  align-items: flex-end;
+  align-items: center; /* clave */
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
+
 
 .precios {
   display: flex;
@@ -379,23 +368,24 @@
 }
 
 .precio {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--marron-principal);
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .precio-antes {
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.7;
-  text-decoration: line-through;
 }
+
 
 /* ===============================
    BOTÓN AGREGAR (SVG BLANCO + HOVER PRO)
 ================================ */
 .acciones {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -405,7 +395,7 @@
   border-radius: 14px;
   padding: 10px 14px;
   font-weight: 900;
-  font-size: 12px;
+  font-size: 14px;
   cursor: pointer;
   background: var(--marron-principal);
   color: #ffffff;
@@ -477,69 +467,6 @@
 }
 
 /* ===============================
-   RESPONSIVE MOBILE
-================================ */
-@media (max-width: 768px) {
-  /* HERO */
-  .hero-carousel { height: 340px; }
-
-  .hero-carousel .content {
-    margin-left: 25px;
-    margin-right: 25px;
-  }
-
-  .hero-carousel h1 { font-size: 28px; }
-  .hero-carousel p { font-size: 14px; }
-
-  /* CATEGORÍAS */
-  .horizontal-scroll {
-    overflow-x: hidden;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-  }
-
-  .card {
-    width: calc(50% - 12px);
-    max-width: 170px;
-  }
-
-  .card img {
-    width: 96px;
-    height: 96px;
-    padding: 10px;
-    object-fit: contain;
-  }
-
-  /* NOVEDADES */
-  .novedades-grid .producto-card {
-    flex: 0 0 220px;
-    width: 220px;
-    height: 350px;
-  }
-
-  .novedades-grid .producto-card .producto-img {
-    height: 180px;
-  }
-
-  .novedades-grid .producto-card .producto-img img {
-    padding: 8px;
-  }
-}
-
-/* Desktop un poco más grande */
-@media (min-width: 900px) {
-  .novedades-grid .producto-card {
-    flex: 0 0 260px;
-    width: 260px;
-    height: 375px;
-  }
-
-  .novedades-grid .producto-card .producto-img {
-    height: 205px;
-  }
-}
-/* ===============================
    BADGE DESCUENTO PRO (%)
 ================================ */
 .badge-oferta{
@@ -577,4 +504,138 @@ cdk-virtual-scroll-viewport {
 
 .cdk-virtual-scroll-content-wrapper {
   display: flex !important;
+}
+
+/* ===============================
+   RESPONSIVE MOBILE
+================================ */
+@media (max-width: 768px) {
+
+  /* CATEGORÍAS */
+  .horizontal-scroll {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .card {
+    width: 100%;
+    max-width: none;
+    padding: 6px 0px;
+    border-radius: 10px;
+  }
+
+.card img {
+  width: 100%;
+  max-width: 46px;
+  height: auto;
+  padding: 2px;
+}
+
+
+
+  .card h3,
+  .card p {
+    font-size: clamp(8.5px, 2.6vw, 10px);
+    line-height: 1.1;
+    margin-top: 4px;
+    text-align: center;
+  }
+}
+
+  /* ===============================
+     NOVEDADES – 2 productos visibles
+  ================================ */
+  .novedades-grid {
+    gap: 10px;
+  }
+
+  .novedades-grid .producto-card {
+    flex: 0 0 calc(50% - 12px);
+    width: calc(50% - 12px);
+    height: 270px;
+  }
+
+  .novedades-grid .producto-card .producto-img {
+    height: 150px;
+  }
+
+  .novedades-grid .producto-card .producto-img img {
+    padding: 6px;
+  }
+
+  /* Precio + botón proporcionales */
+  .precio {
+    font-size: 16px;
+  }
+
+  .precio-antes {
+    font-size: 10px;
+  }
+
+  .btn-add {
+    padding: 6px 10px;
+    font-size: 10px;
+    border-radius: 10px;
+  }
+
+  .btn-add .btn-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+
+/* ===============================
+   Hover solo para desktop
+================================ */
+@media (hover: hover) and (pointer: fine) {
+  .novedades-grid .producto-card:hover .producto-img img {
+    transform: scale(1.04);
+  }
+}
+
+/* ===============================
+   Desktop un poco más grande
+================================ */
+@media (min-width: 900px) {
+  .novedades-grid .producto-card {
+    flex: 0 0 260px;
+    width: 260px;
+    height: 375px;
+  }
+
+  .novedades-grid .producto-card .producto-img {
+    height: 205px;
+  }
+}
+/* ===============================
+   DESKTOP PRO – PRECIO + BOTÓN
+================================ */
+@media (min-width: 1024px) {
+
+  /* Precio principal */
+  .precio {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.3px;
+  }
+
+  /* Precio antes */
+  .precio-antes {
+    font-size: 13px;
+  }
+
+  /* Botón agregar */
+  .btn-add {
+    padding: 12px 18px;
+    font-size: 15px;
+    border-radius: 16px;
+  }
+
+  .btn-add .btn-icon {
+    width: 20px;
+    height: 20px;
+  }
 }

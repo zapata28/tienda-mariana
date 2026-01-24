@@ -12,7 +12,7 @@ import {
 @Component({
   selector: 'app-categoria',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule],
   templateUrl: './categoria.html',
   styleUrls: ['./categoria.css'],
 })

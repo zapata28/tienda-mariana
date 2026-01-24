@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase.client';
 
@@ -39,10 +41,16 @@ type ToastItem = { id: string; type: ToastType; title: string; message: string; 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule // 🔥 ESTE FALTABA
+  ],
   templateUrl: './admin.html',
   styleUrls: ['./admin.css'],
 })
+
+
 export class Admin implements OnInit {
   loading = true;
   loadingMore = false;
@@ -57,6 +65,9 @@ export class Admin implements OnInit {
   pageSize = 12;
   offset = 0;
   hasMore = true;
+
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   // =========================
   // TOASTS
@@ -82,9 +93,7 @@ export class Admin implements OnInit {
     this.toasts = this.toasts.filter(x => x.id !== id);
   }
 
-  // =========================
   // Catálogo (Categoría → Grupo → Subgrupo)
-  // =========================
   catalogo: Record<CategoriaSlug, { nombre: string; items: string[] }[]> = {
     maquillaje: [
       { nombre: 'Rostro', items: ['Bases', 'Bb cream', 'Correctores', 'Polvos', 'Primer', 'Contornos', 'Iluminadores', 'Rubores', 'Bronzer', 'Fijadores'] },
@@ -108,25 +117,16 @@ export class Admin implements OnInit {
     ],
   };
 
-  // =========================
   // Crear
-  // =========================
   form: ProductoForm = this.nuevoForm();
-
-  // OJO: ahora guardamos el File ya optimizado aquí
   fileSeleccionado: File | null = null;
   imagenPreviewLocal: string | null = null;
-
   submittedCrear = false;
   errorsCrear: Partial<Record<keyof ProductoForm, string>> = {};
-
-  // Drag & Drop flags
   dragOverCrear = false;
   dragOverEditar = false;
 
-  // =========================
   // Modal editar
-  // =========================
   modalOpen = false;
   modalClosing = false;
   editandoId: string | null = null;
@@ -166,9 +166,7 @@ export class Admin implements OnInit {
     return g?.items ?? [];
   }
 
-  // =========================
   // Form
-  // =========================
   nuevoForm(): ProductoForm {
     return {
       nombre: '',
@@ -232,10 +230,11 @@ export class Admin implements OnInit {
       this.loadingMore = true;
     }
 
-    let query = supabase
-      .from('productos')
-      .select('*')
-      .order('created_at', { ascending: false });
+ let query = supabase
+  .from('productos')
+  .select('*', { count: 'exact' })
+  .order('created_at', { ascending: false });
+
 
     if (this.filtroCategoria !== 'todas') {
       query = query.eq('categoria', this.filtroCategoria);
@@ -248,24 +247,29 @@ export class Admin implements OnInit {
     const from = this.offset;
     const to = this.offset + this.pageSize - 1;
 
-    const { data, error } = await query.range(from, to);
+    const { data, error, count } = await query.range(from, to);
 
     if (error) {
       console.error('Error cargando productos:', error);
       this.toast('error', 'No se pudieron cargar los productos.', 'Error');
       this.loading = false;
       this.loadingMore = false;
+      this.cdr.detectChanges(); // 🔥
       return;
     }
 
-    const rows = (data ?? []) as Producto[];
-    this.productos = [...this.productos, ...rows];
 
-    if (rows.length < this.pageSize) {
-      this.hasMore = false;
-    } else {
-      this.offset += this.pageSize;
-    }
+const rows = (data ?? []) as Producto[];
+this.productos = [...this.productos, ...rows];
+
+const totalLoaded = this.offset + rows.length;
+
+if (count !== null && totalLoaded >= count) {
+  this.hasMore = false;
+} else {
+  this.offset += this.pageSize;
+}
+
 
     this.loading = false;
     this.loadingMore = false;

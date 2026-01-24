@@ -20,15 +20,6 @@
   top: 0;
   z-index: 1100;
 }
-
-@media (max-width: 768px) {
-  .top-bar {
-    flex-direction: column;
-    gap: 5px;
-    text-align: center;
-  }
-}
-
 /* ===============================
    HEADER
 ================================ */
@@ -406,6 +397,7 @@
     z-index: 11;
   }
 
+
   .header nav.open {
     display: flex;
   }
@@ -432,5 +424,12 @@
 
   .icons {
     display: flex;
+  }
+}
+@media (max-width: 768px) {
+  .top-bar {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
   }
 }
