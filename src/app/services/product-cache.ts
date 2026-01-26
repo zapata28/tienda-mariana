@@ -5,6 +5,7 @@ interface CacheItem<T> {
   timestamp: number;
 }
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -37,3 +38,4 @@ export class ProductCacheService {
     else this.cache.clear();
   }
 }
+

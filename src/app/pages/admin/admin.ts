@@ -1,7 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
 import { FormsModule } from '@angular/forms';
 import { supabase } from '../../supabase.client';
 
@@ -67,7 +66,10 @@ export class Admin implements OnInit {
   hasMore = true;
 
 
-  constructor(private cdr: ChangeDetectorRef) {}
+constructor(
+  private cdr: ChangeDetectorRef,
+  private zone: NgZone
+) {}
 
   // =========================
   // TOASTS
@@ -219,69 +221,70 @@ export class Admin implements OnInit {
   // =========================
   // Cargar productos (paginado)
   // =========================
-  async cargarProductos(reset: boolean) {
-    if (reset) {
-      this.loading = true;
-      this.offset = 0;
-      this.hasMore = true;
-      this.productos = [];
-    } else {
-      if (!this.hasMore || this.loadingMore) return;
-      this.loadingMore = true;
-    }
+async cargarProductos(reset: boolean) {
+  if (reset) {
+    this.loading = true;
+    this.offset = 0;
+    this.hasMore = true;
+    this.productos = [];
+  } else {
+    if (!this.hasMore || this.loadingMore) return;
+    this.loadingMore = true;
+  }
 
- let query = supabase
-  .from('productos')
-  .select('*', { count: 'exact' })
-  .order('created_at', { ascending: false });
+  let query = supabase
+    .from('productos')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false });
 
+  if (this.filtroCategoria !== 'todas') {
+    query = query.eq('categoria', this.filtroCategoria);
+  }
 
-    if (this.filtroCategoria !== 'todas') {
-      query = query.eq('categoria', this.filtroCategoria);
-    }
+  if (this.busqueda.trim()) {
+    query = query.ilike('nombre', `%${this.busqueda.trim()}%`);
+  }
 
-    if (this.busqueda.trim()) {
-      query = query.ilike('nombre', `%${this.busqueda.trim()}%`);
-    }
+  const from = this.offset;
+  const to = this.offset + this.pageSize - 1;
 
-    const from = this.offset;
-    const to = this.offset + this.pageSize - 1;
+  const { data, error, count } = await query.range(from, to);
 
-    const { data, error, count } = await query.range(from, to);
-
+  // 👇 AQUÍ ES DONDE ARREGLAMOS TODO
+  this.zone.run(() => {
     if (error) {
-      console.error('Error cargando productos:', error);
+      console.error(error);
       this.toast('error', 'No se pudieron cargar los productos.', 'Error');
       this.loading = false;
       this.loadingMore = false;
-      this.cdr.detectChanges(); // 🔥
       return;
     }
 
+    const rows = (data ?? []) as Producto[];
+    this.productos = [...this.productos, ...rows];
 
-const rows = (data ?? []) as Producto[];
-this.productos = [...this.productos, ...rows];
+    const totalLoaded = this.offset + rows.length;
 
-const totalLoaded = this.offset + rows.length;
-
-if (count !== null && totalLoaded >= count) {
-  this.hasMore = false;
-} else {
-  this.offset += this.pageSize;
-}
-
+    if (count !== null && totalLoaded >= count) {
+      this.hasMore = false;
+    } else {
+      this.offset += this.pageSize;
+    }
 
     this.loading = false;
     this.loadingMore = false;
-  }
+  });
+}
 
-  async aplicarFiltro() {
-    await this.cargarProductos(true);
-  }
+async aplicarFiltro() {
+  await this.cargarProductos(true);
+}
 
-  async cargarMas() {
-    await this.cargarProductos(false);
-  }
+async cargarMas() {
+  await this.cargarProductos(false);
+}
+
+
 
   // =========================
   // 🖼️ OPTIMIZACIÓN (resize + compresión)
@@ -529,57 +532,67 @@ if (count !== null && totalLoaded >= count) {
   // =========================
   // CREATE
   // =========================
-  async crearProducto() {
-    this.submittedCrear = true;
-    this.errorsCrear = this.buildErrors(this.form);
+async crearProducto() {
+  this.submittedCrear = true;
+  this.errorsCrear = this.buildErrors(this.form);
 
-    if (this.hasErrors(this.errorsCrear)) {
-      this.toast('error', 'Revisa los campos en rojo.', 'Validación');
-      this.focusFirstInvalid();
-      return;
-    }
-
-    this.saving = true;
-
-    // subir imagen si hay archivo (YA optimizado)
-    if (this.fileSeleccionado) {
-      const url = await this.subirImagenAStorage(this.fileSeleccionado);
-      if (!url) {
-        this.saving = false;
-        this.toast('error', 'No se pudo subir la imagen.', 'Error');
-        return;
-      }
-      this.form.imagen = url;
-    }
-
-    const payload = {
-      nombre: this.form.nombre.trim(),
-      descripcion: this.form.descripcion?.trim() || null,
-      precio: Number(this.form.precio),
-      categoria: this.form.categoria,
-      grupo: this.form.grupo,
-      subgrupo: this.form.subgrupo,
-      imagen: this.form.imagen || null,
-      es_nuevo: this.form.es_nuevo,
-      en_oferta: this.form.en_oferta,
-      precio_antes: this.form.en_oferta ? (this.form.precio_antes ?? null) : null,
-    };
-
-    const { error } = await supabase.from('productos').insert(payload);
-
-    if (error) {
-      console.error('Error creando producto:', error);
-      this.saving = false;
-      this.toast('error', 'No se pudo crear el producto.', 'Error');
-      return;
-    }
-
-    this.saving = false;
-    this.toast('success', 'Producto creado correctamente.', 'Éxito');
-
-    this.limpiarFormularioCrear();
-    await this.cargarProductos(true);
+  if (this.hasErrors(this.errorsCrear)) {
+    this.toast('error', 'Revisa los campos en rojo.', 'Validación');
+    this.focusFirstInvalid();
+    this.cdr.detectChanges(); // 🔥
+    return;
   }
+
+  this.saving = true;
+  this.cdr.detectChanges(); // 🔥 muestra loader
+
+  // subir imagen si hay archivo (YA optimizado)
+  if (this.fileSeleccionado) {
+    const url = await this.subirImagenAStorage(this.fileSeleccionado);
+    if (!url) {
+      this.saving = false;
+      this.toast('error', 'No se pudo subir la imagen.', 'Error');
+      this.cdr.detectChanges(); // 🔥
+      return;
+    }
+    this.form.imagen = url;
+    this.cdr.detectChanges(); // 🔥 preview / estado
+  }
+
+  const payload = {
+    nombre: this.form.nombre.trim(),
+    descripcion: this.form.descripcion?.trim() || null,
+    precio: Number(this.form.precio),
+    categoria: this.form.categoria,
+    grupo: this.form.grupo,
+    subgrupo: this.form.subgrupo,
+    imagen: this.form.imagen || null,
+    es_nuevo: this.form.es_nuevo,
+    en_oferta: this.form.en_oferta,
+    precio_antes: this.form.en_oferta ? (this.form.precio_antes ?? null) : null,
+  };
+
+  const { error } = await supabase.from('productos').insert(payload);
+
+  if (error) {
+    console.error('Error creando producto:', error);
+    this.saving = false;
+    this.toast('error', 'No se pudo crear el producto.', 'Error');
+    this.cdr.detectChanges(); // 🔥
+    return;
+  }
+
+  this.saving = false;
+  this.toast('success', 'Producto creado correctamente.', 'Éxito');
+  this.cdr.detectChanges(); // 🔥
+
+  this.limpiarFormularioCrear();
+  this.cdr.detectChanges(); // 🔥 limpia la UI
+
+  await this.cargarProductos(true);
+  this.cdr.detectChanges(); // 🔥 renderiza la lista
+}
+
 
   // =========================
   // MODAL EDITAR
@@ -657,74 +670,96 @@ if (count !== null && totalLoaded >= count) {
   }
 
   async guardarEdicion() {
-    if (!this.editandoId) return;
+  if (!this.editandoId) return;
 
-    this.submittedEditar = true;
-    this.errorsEditar = this.buildErrors(this.editForm);
+  this.submittedEditar = true;
+  this.errorsEditar = this.buildErrors(this.editForm);
 
-    if (this.hasErrors(this.errorsEditar)) {
-      this.toast('error', 'Revisa los campos en rojo.', 'Validación');
-      this.focusFirstInvalid();
-      return;
-    }
-
-    this.saving = true;
-
-    // subir imagen si cambió (YA optimizada)
-    if (this.editFile) {
-      const url = await this.subirImagenAStorage(this.editFile);
-      if (!url) {
-        this.saving = false;
-        this.toast('error', 'No se pudo subir la imagen.', 'Error');
-        return;
-      }
-      this.editForm.imagen = url;
-    }
-
-    const payload = {
-      nombre: this.editForm.nombre.trim(),
-      descripcion: this.editForm.descripcion?.trim() || null,
-      precio: Number(this.editForm.precio),
-      categoria: this.editForm.categoria,
-      grupo: this.editForm.grupo,
-      subgrupo: this.editForm.subgrupo,
-      imagen: this.editForm.imagen || null,
-      es_nuevo: this.editForm.es_nuevo,
-      en_oferta: this.editForm.en_oferta,
-      precio_antes: this.editForm.en_oferta ? (this.editForm.precio_antes ?? null) : null,
-    };
-
-    const { error } = await supabase.from('productos').update(payload).eq('id', this.editandoId);
-
-    if (error) {
-      console.error('Error actualizando producto:', error);
-      this.saving = false;
-      this.toast('error', 'No se pudo actualizar el producto.', 'Error');
-      return;
-    }
-
-    this.saving = false;
-    this.toast('success', 'Producto actualizado.', 'Éxito');
-    this.cerrarModal();
-    await this.cargarProductos(true);
+  if (this.hasErrors(this.errorsEditar)) {
+    this.toast('error', 'Revisa los campos en rojo.', 'Validación');
+    this.focusFirstInvalid();
+    this.cdr.detectChanges(); // 🔥
+    return;
   }
+
+  this.saving = true;
+  this.cdr.detectChanges(); // 🔥 loader
+
+  // subir imagen si cambió (YA optimizada)
+  if (this.editFile) {
+    const url = await this.subirImagenAStorage(this.editFile);
+    if (!url) {
+      this.saving = false;
+      this.toast('error', 'No se pudo subir la imagen.', 'Error');
+      this.cdr.detectChanges(); // 🔥
+      return;
+    }
+    this.editForm.imagen = url;
+    this.cdr.detectChanges(); // 🔥
+  }
+
+  const payload = {
+    nombre: this.editForm.nombre.trim(),
+    descripcion: this.editForm.descripcion?.trim() || null,
+    precio: Number(this.editForm.precio),
+    categoria: this.editForm.categoria,
+    grupo: this.editForm.grupo,
+    subgrupo: this.editForm.subgrupo,
+    imagen: this.editForm.imagen || null,
+    es_nuevo: this.editForm.es_nuevo,
+    en_oferta: this.editForm.en_oferta,
+    precio_antes: this.editForm.en_oferta ? (this.editForm.precio_antes ?? null) : null,
+  };
+
+  const { error } = await supabase
+    .from('productos')
+    .update(payload)
+    .eq('id', this.editandoId);
+
+  if (error) {
+    console.error('Error actualizando producto:', error);
+    this.saving = false;
+    this.toast('error', 'No se pudo actualizar el producto.', 'Error');
+    this.cdr.detectChanges(); // 🔥
+    return;
+  }
+
+  this.saving = false;
+  this.toast('success', 'Producto actualizado.', 'Éxito');
+  this.cdr.detectChanges(); // 🔥
+
+  this.cerrarModal();
+  this.cdr.detectChanges(); // 🔥 cierre visual
+
+  await this.cargarProductos(true);
+  this.cdr.detectChanges(); // 🔥 refresco lista
+}
+
 
   // =========================
   // DELETE
   // =========================
-  async eliminar(p: Producto) {
-    const ok = confirm(`¿Eliminar "${p.nombre}"?`);
-    if (!ok) return;
+async eliminar(p: Producto) {
+  const ok = confirm(`¿Eliminar "${p.nombre}"?`);
+  if (!ok) return;
 
-    const { error } = await supabase.from('productos').delete().eq('id', p.id);
+  const { error } = await supabase
+    .from('productos')
+    .delete()
+    .eq('id', p.id);
 
-    if (error) {
-      console.error('Error eliminando producto:', error);
-      this.toast('error', 'No se pudo eliminar el producto.', 'Error');
-      return;
-    }
-
-    this.toast('success', 'Producto eliminado.', 'Éxito');
-    await this.cargarProductos(true);
+  if (error) {
+    console.error('Error eliminando producto:', error);
+    this.toast('error', 'No se pudo eliminar el producto.', 'Error');
+    this.cdr.detectChanges(); // 🔥
+    return;
   }
+
+  this.toast('success', 'Producto eliminado.', 'Éxito');
+  this.cdr.detectChanges(); // 🔥 muestra toast
+
+  await this.cargarProductos(true);
+  this.cdr.detectChanges(); // 🔥 refresca lista
+}
+
 }

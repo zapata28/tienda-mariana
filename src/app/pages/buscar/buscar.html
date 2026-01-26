@@ -1,0 +1,19 @@
+<section class="search-page">
+  <h2>Resultados para “{{ term }}”</h2>
+
+  <p *ngIf="!loading && results.length === 0">
+    No encontramos productos 😢
+  </p>
+
+  <div class="grid" *ngIf="!loading">
+    <article class="card" *ngFor="let p of results">
+      <img [src]="p.imagen" [alt]="p.nombre" />
+      <h3>{{ p.nombre }}</h3>
+      <p class="price">
+        {{ p.precio | currency:'COP':'symbol':'1.0-0' }}
+      </p>
+    </article>
+  </div>
+
+  <p *ngIf="loading">Buscando… 🔍</p>
+</section>

@@ -335,9 +335,8 @@
   font-size: 13px;
   font-weight: 900;
   color: var(--texto-principal);
-
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

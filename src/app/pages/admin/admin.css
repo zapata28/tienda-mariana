@@ -250,7 +250,7 @@
 }
 
 .dropzone.over{
-  border-color: var(--verde-principal);
+  border-color: var(--marron-principal);
   background: rgba(47,125,90,0.06);
   box-shadow: 0 0 0 3px rgba(47,125,90,0.14);
 }

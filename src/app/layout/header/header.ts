@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { Auth } from '../../auth/auth';
 import { CartService } from '../../cart.service';
 
@@ -9,7 +10,8 @@ import { CartService } from '../../cart.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink
+    RouterLink,
+    FormsModule
   ],
   templateUrl: './header.html',
   styleUrls: ['./header.css'],
@@ -17,9 +19,13 @@ import { CartService } from '../../cart.service';
 export class HeaderComponent {
 
   // Estados de UI
-  menuOpen: boolean = false;
-  cartOpen: boolean = false;
-  userMenuOpen: boolean = false;
+  menuOpen = false;
+  cartOpen = false;
+  userMenuOpen = false;
+
+  // 🔍 BUSQUEDA
+  searchOpen = false;
+  searchTerm = '';
 
   constructor(
     public auth: Auth,
@@ -41,15 +47,11 @@ export class HeaderComponent {
   ================================ */
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
-
     if (this.menuOpen) {
       this.cartOpen = false;
       this.userMenuOpen = false;
+      this.searchOpen = false;
     }
-  }
-
-  closeMenu(): void {
-    this.menuOpen = false;
   }
 
   /* ===============================
@@ -57,10 +59,10 @@ export class HeaderComponent {
   ================================ */
   toggleCart(): void {
     this.cartOpen = !this.cartOpen;
-
     if (this.cartOpen) {
       this.menuOpen = false;
       this.userMenuOpen = false;
+      this.searchOpen = false;
     }
   }
 
@@ -73,15 +75,35 @@ export class HeaderComponent {
   ================================ */
   toggleUserMenu(): void {
     this.userMenuOpen = !this.userMenuOpen;
-
     if (this.userMenuOpen) {
       this.menuOpen = false;
       this.cartOpen = false;
+      this.searchOpen = false;
     }
   }
 
-  closeUserMenu(): void {
-    this.userMenuOpen = false;
+  /* ===============================
+     BUSQUEDA
+  ================================ */
+  toggleSearch(): void {
+    this.searchOpen = !this.searchOpen;
+    if (this.searchOpen) {
+      this.menuOpen = false;
+      this.cartOpen = false;
+      this.userMenuOpen = false;
+    }
+  }
+
+  goSearch(): void {
+    if (!this.searchTerm.trim()) return;
+
+    this.router.navigate(['/buscar'], {
+      queryParams: { q: this.searchTerm.trim() }
+    });
+
+    this.searchTerm = '';
+    this.searchOpen = false;
+    this.closeAll();
   }
 
   /* ===============================
@@ -91,5 +113,6 @@ export class HeaderComponent {
     this.menuOpen = false;
     this.cartOpen = false;
     this.userMenuOpen = false;
+    this.searchOpen = false;
   }
 }

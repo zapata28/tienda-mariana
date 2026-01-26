@@ -18,8 +18,6 @@ export type Producto = {
   es_nuevo?: boolean | null;
   en_oferta?: boolean | null;
   precio_antes?: number | null;
-
-
   grupo?: string | null;
   subgrupo?: string | null;
 };
@@ -63,5 +61,32 @@ export class ProductService {
       data: data ?? [],
       total: count ?? 0,
     };
+  }
+
+  // 🔍 BÚSQUEDA
+  async search(term: string): Promise<Producto[]> {
+    const clean = term.trim().toLowerCase();
+    if (!clean) return [];
+
+    const cacheKey = `search-${clean}`;
+    const cached = this.cache.get<Producto[]>(cacheKey);
+    if (cached) return cached;
+
+    const { data, error } = await supabase
+      .from('productos')
+      .select('*')
+      .or(
+        `nombre.ilike.%${clean}%,descripcion.ilike.%${clean}%`
+      )
+      .order('nombre')
+      .limit(40);
+
+    if (error) {
+      console.error('Error búsqueda:', error.message);
+      return [];
+    }
+
+    this.cache.set(cacheKey, data ?? []);
+    return data ?? [];
   }
 }

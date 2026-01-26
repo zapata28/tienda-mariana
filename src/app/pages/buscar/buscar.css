@@ -1,0 +1,36 @@
+.search-page {
+  padding: 30px 18px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.search-page h2 {
+  margin-bottom: 20px;
+  color: var(--marron-principal);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.price {
+  font-weight: 900;
+  color: var(--marron-principal);
+}

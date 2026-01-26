@@ -56,6 +56,33 @@
   <!-- ICONS -->
   <div class="icons">
 
+    <!-- BUSQUEDA -->
+<div class="search" (click)="$event.stopPropagation()">
+<button
+  class="icon-btn"
+  type="button"
+  (click)="toggleSearch()"
+  aria-label="Buscar"
+  title="Buscar"
+>
+  <svg class="search-icon" viewBox="0 0 24 24">
+    <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+    <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+</button>
+
+  <!-- Input desplegable -->
+  <div class="search-box" *ngIf="searchOpen">
+    <input
+      type="text"
+      placeholder="Buscar productos…"
+      [(ngModel)]="searchTerm"
+      (keydown.enter)="goSearch()"
+    />
+    <button type="button" (click)="goSearch()">➜</button>
+  </div>
+</div>
+
     <!-- CARRITO -->
     <button
       class="cart-btn"
@@ -98,7 +125,6 @@
     />
   </svg>
 </a>
-
 
       <!-- Si SÍ está logueado -> abre menú -->
       <button

@@ -178,14 +178,14 @@
   box-shadow: 0 6px 12px rgba(47, 125, 90, 0.28);
 }
 
-/* ===============================
-   MINI CARRITO
-================================ */
+/* MINI CARRITO */
 .mini-cart {
-  position: absolute;
+  position: fixed;
   right: 10px;
+  left: 10px;
   top: calc(100% + 10px);
-  width: min(380px, calc(100vw - 20px));
+  width: auto;
+  max-width: none;
   background: #ffffff;
   border: 1px solid var(--marron-principal);
   border-radius: 18px;
@@ -193,7 +193,11 @@
   padding: 12px;
   z-index: 50;
   overflow: hidden;
-}
+  max-height: 70vh;
+  overflow-y: auto;
+  }
+
+
 
 .mini-top {
   display: flex;
@@ -432,4 +436,66 @@
     gap: 5px;
     text-align: center;
   }
+}
+
+
+
+
+
+/* ===============================
+   SEARCH
+================================ */
+.search {
+  position: relative;
+}
+
+.search-box {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--marron-principal);
+  border-radius: 14px;
+  padding: 6px 8px;
+  box-shadow: 0 16px 35px rgba(0,0,0,0.18);
+  z-index: 1200;
+}
+
+.search-box input {
+  border: 0;
+  outline: none;
+  font-size: 14px;
+  padding: 8px 10px;
+  width: 180px;
+  color: var(--marron-principal);
+}
+
+.search-box button {
+  border: 0;
+  background: var(--marron-claro);
+  color: #fff;
+  font-weight: 900;
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.search-box button:hover {
+  background: var(--marron-hover);
+}
+
+/* ICONO BUSQUEDA */
+.search-icon {
+  width: 19px;
+  height: 19px;
+  display: block;
+  color: var(--marron-principal);
+}
+
+/* hover hereda del icon-btn */
+.icon-btn:hover .search-icon {
+  color: var(--marron-principal);
 }

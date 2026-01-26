@@ -44,6 +44,13 @@ export const routes: Routes = [
     ),
   runGuardsAndResolvers: 'always'
 },
+{
+  path: 'buscar',
+  loadComponent: () =>
+    import('./pages/buscar/buscar')
+      .then(m => m.BuscarComponent)
+},
+
 
   { path: '**', redirectTo: '' },
 ];

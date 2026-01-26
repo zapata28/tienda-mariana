@@ -1,13 +1,20 @@
+:root {
+  --marron-principal: #7f5539;
+  --marron-hover: #9c6644;
+  --marron-claro: #b08968;
+  --beige-suave: #ddb892;
+  --texto-principal: #000000;
+}
 .login-wrap{
   min-height: calc(100vh - 140px);
   display:flex;
   align-items:center;
   justify-content:center;
-  padding: 24px;
+  padding: 20px;
 }
 
 .login-card{
-  width: 100%;
+  width: 90%;
   max-width: 420px;
   background: #fff;
   border: 1px solid rgba(0,0,0,0.08);
@@ -21,7 +28,7 @@ h1{ margin: 0 0 6px; font-size: 22px; }
 
 .lbl{ display:block; font-weight: 800; font-size: 13px; margin: 10px 0 6px; }
 .inp{
-  width:100%;
+  width:90%;
   padding: 12px;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.15);
@@ -36,7 +43,7 @@ h1{ margin: 0 0 6px; font-size: 22px; }
   border-radius: 12px;
   cursor:pointer;
   font-weight: 900;
-  background: var(--verde-principal, #2f7d5a);
+  background: var(--marron-principal);
   color:#fff;
 }
 .btn:disabled{ opacity:.65; cursor:not-allowed; }

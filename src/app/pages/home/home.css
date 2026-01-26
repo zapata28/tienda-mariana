@@ -6,25 +6,36 @@
   --texto-principal: #000000;
 }
 
-/* ===============================
-   HERO CAROUSEL
-================================ */
-.hero-carousel {
-  position: relative;
-  width: 100%;
-  height: 420px;
-  overflow: hidden;
+/* ================= HERO – CONTENEDOR GENERAL ================= */
+.hero-wrapper {
+  max-width: 800px;   /* ancho total del hero */
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 24px;
+  background: rgba(221, 184, 146, 0.2); /* color tipo novedades, semi-transparente */
+  box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Contenedor interno que mantiene la imagen y el texto */
+.hero-carousel {
+  display: flex;
+  gap: 40px;       /* espacio entre imagen y texto */
+  width: 100%;
+  height: 420px;
+  position: relative;
+}
+
+/* Slide individual */
 .hero-carousel .slide {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0;
-  transition: opacity 1s ease-in-out;
   display: flex;
   align-items: center;
+  gap: 40px;
+  position: absolute;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
 }
 
 .hero-carousel .slide.active {
@@ -32,60 +43,52 @@
   z-index: 1;
 }
 
-.hero-carousel .slide::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.6) 0%,
-    rgba(0,0,0,0.35) 45%,
-    rgba(0,0,0,0.15) 100%
-  );
+/* Recuadro de la imagen */
+.hero-carousel .slide .image-container {
+  flex-shrink: 0;
+  width: 450px;
+  height: 380px;
+  border-radius: 15px;
+  overflow: hidden;
 }
 
-/* Contenido */
-.hero-carousel .content {
-  position: relative;
-  max-width: 520px;
-  margin-left: 60px;
-  color: #ffffff;
-  z-index: 2;
+/* Imagen dentro del recuadro */
+.hero-carousel .slide .image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
 }
-
+/* Encabezado y descripción */
 .hero-carousel h1 {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 8px rgba(216, 133, 133, 0.35);
-  margin: 0 0 10px 0;
-  color: #ffffff;
+  font-size: 44px;
+  margin: 0 0 12px 0;
 }
 
 .hero-carousel p {
-  font-size: 16px;
+  font-size: 18px;
   margin: 0 0 22px 0;
-  opacity: 0.95;
-  color: #ffffff;
+  line-height: 1.4;
 }
 
 /* Botón */
 .hero-carousel button {
-  padding: 12px 22px;
+  padding: 14px 26px;
   border: none;
   background: var(--marron-claro);
   font-weight: bold;
   cursor: pointer;
   border-radius: 6px;
+  color: #fff;
   transition: background 0.3s ease;
-  color: #ffffff;
 }
 
 .hero-carousel button:hover {
   background: var(--marron-hover);
 }
 
-/* Indicadores (dots) */
+/* DOTS */
 .hero-carousel .dots {
   position: absolute;
   bottom: 18px;
@@ -93,28 +96,135 @@
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
-  z-index: 5;
+  z-index: 3;
 }
 
 .hero-carousel .dot {
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(127,85,57,0.5); /* marrón suave */
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .hero-carousel .dot.active {
-  background: #ffffff;
-  transform: scale(1.2);
+  background: var(--marron-principal);
+  transform: scale(1.3);
 }
 
 .hero-carousel h1,
-.hero-carousel p,
-.hero-carousel button {
-  color: #ffffff !important;
+.hero-carousel p{
+  color: var(--marron-principal);
 }
+
+/* ================= HERO – RESPONSIVE CORREGIDO ================= */
+@media (max-width: 1024px) {
+  .hero-wrapper {
+    padding: 16px;
+  }
+
+  .hero-carousel {
+    gap: 24px;
+    height: 400px; /* ajustamos un poco la altura */
+  }
+
+  /* Slides siguen absolutos para el carrusel */
+  .hero-carousel .slide {
+    flex-direction: row; /* imagen y texto lado a lado */
+    gap: 24px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+
+  .hero-carousel .slide .image-container {
+    width: 50%;
+    height: 100%;
+  }
+
+  .hero-carousel .content {
+    width: 50%;
+    max-width: 350px;
+    padding-left: 12px;
+  }
+
+  .hero-carousel h1 {
+    font-size: 36px;
+  }
+
+  .hero-carousel p {
+    font-size: 16px;
+  }
+
+  .hero-carousel button {
+    padding: 12px 24px;
+  }
+
+  .hero-carousel .dots {
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  .hero-carousel .dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hero-carousel .dot.active {
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-wrapper {
+    padding: 12px;
+  }
+
+  .hero-carousel .slide {
+    flex-direction: column; /* ahora sí apilamos en móvil */
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .hero-carousel .slide .image-container {
+    width: 100%;
+    height: 220px;
+  }
+
+  .hero-carousel .content {
+    width: 100%;
+    text-align: center;
+    max-width: none;
+    padding: 0;
+  }
+
+  .hero-carousel h1 {
+    font-size: 28px;
+  }
+
+  .hero-carousel p {
+    font-size: 14px;
+  }
+
+  .hero-carousel button {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  .hero-carousel .dots {
+    bottom: 8px;
+  }
+
+  .hero-carousel .dot {
+    width: 8px;
+    height: 8px;
+  }
+}
+
 
    /* TÍTULOS DE SECCIÓN */
 .section-title {

@@ -36,65 +36,19 @@ export class Home implements OnInit, OnDestroy {
   ) {}
 
   /* ================= HERO ================= */
+  heroProductos: Producto[] = [];
   currentSlide = 0;
   autoplayId: any;
   autoplayMs = 5000;
 
-  slides = [
-    {
-      image: 'img/centella-ampoule.jpg',
-      title: 'Espuma de ampolla de centella',
-      text: 'Limpiador facial suave con Centella Asiática.',
-      button: 'Ver producto',
-    },
-    {
-      image: 'img/Mixsoon_Centella.jpg',
-      title: 'Espuma calmante para piel sensible',
-      text: 'Limpia sin irritar la piel.',
-      button: 'Explorar',
-    },
-    {
-      image: '',
-      title: 'Tu rutina empieza aquí',
-      text: 'Descubre productos pensados para ti.',
-      button: 'Ver todo',
-    },
-  ];
-
-  /* ================= CATEGORÍAS ================= */
-  categorias = [
-    { name: 'Maquillaje', slug: 'maquillaje', img: 'assets/icons/icono-maquillaje.png' },
-    { name: 'Cuidado de la piel', slug: 'skincare', img: 'assets/icons/icono-cuidado-facial.png' },
-    { name: 'Cuidado capilar', slug: 'capilar', img: 'assets/icons/icono-cuidado-capilar.png' },
-    { name: 'Accesorios', slug: 'accesorios', img: 'assets/icons/icono-accesorios.png' },
-  ];
-
-  /* ================= DATA ================= */
-  loadingNovedades = true;
-  loadingOfertas = true;
-
-  novedades: Producto[] = [];
-  ofertas: Producto[] = [];
-
-  /* ================= LIFECYCLE ================= */
-  ngOnInit() {
-    this.startAutoplay();
-    this.cargarNovedades();
-    this.cargarOfertas();
-  }
-
-  ngOnDestroy() {
-    clearInterval(this.autoplayId);
-  }
-
-  /* ================= HERO ================= */
   goToSlide(i: number) {
     this.currentSlide = i;
     this.restartAutoplay();
   }
 
   nextSlide() {
-    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+    if (!this.heroProductos.length) return;
+    this.currentSlide = (this.currentSlide + 1) % this.heroProductos.length;
   }
 
   startAutoplay() {
@@ -112,6 +66,50 @@ export class Home implements OnInit, OnDestroy {
 
   resumeAutoplay() {
     this.startAutoplay();
+  }
+
+  async cargarHero() {
+    const key = 'home_hero';
+    const cached = this.cache.get<Producto[]>(key);
+    if (cached) {
+      this.heroProductos = cached;
+      return;
+    }
+
+    const { data } = await supabase
+      .from('productos')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5); // Ajusta la cantidad de productos que quieras en el hero
+
+    this.heroProductos = data ?? [];
+    this.cache.set(key, this.heroProductos);
+  }
+
+  /* ================= CATEGORÍAS ================= */
+  categorias = [
+    { name: 'Maquillaje', slug: 'maquillaje', img: 'assets/icons/icono-maquillaje.png' },
+    { name: 'Cuidado de la piel', slug: 'skincare', img: 'assets/icons/icono-cuidado-facial.png' },
+    { name: 'Cuidado capilar', slug: 'capilar', img: 'assets/icons/icono-cuidado-capilar.png' },
+    { name: 'Accesorios', slug: 'accesorios', img: 'assets/icons/icono-accesorios.png' },
+  ];
+
+  /* ================= DATA ================= */
+  loadingNovedades = true;
+  loadingOfertas = true;
+  novedades: Producto[] = [];
+  ofertas: Producto[] = [];
+
+  /* ================= LIFECYCLE ================= */
+  ngOnInit() {
+    this.startAutoplay();
+    this.cargarHero();
+    this.cargarNovedades();
+    this.cargarOfertas();
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.autoplayId);
   }
 
   /* ================= NAV ================= */
@@ -146,7 +144,6 @@ export class Home implements OnInit, OnDestroy {
   async cargarNovedades() {
     const key = 'home_novedades';
     const cached = this.cache.get<Producto[]>(key);
-
     if (cached) {
       this.novedades = cached;
       this.loadingNovedades = false;
@@ -167,7 +164,6 @@ export class Home implements OnInit, OnDestroy {
   async cargarOfertas() {
     const key = 'home_ofertas';
     const cached = this.cache.get<Producto[]>(key);
-
     if (cached) {
       this.ofertas = cached;
       this.loadingOfertas = false;

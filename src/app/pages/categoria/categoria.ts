@@ -83,28 +83,141 @@ ngOnInit(): void {
   /* =======================
      GRUPOS
   ======================= */
-  setGrupos() {
-    if (this.slugActual === 'maquillaje') {
-      this.grupos = [
-        { nombre: 'Rostro', items: ['Bases', 'Correctores', 'Polvos'] },
-        { nombre: 'Ojos', items: ['Sombras', 'Pestañinas'] },
-        { nombre: 'Labios', items: ['Labial', 'Brillo'] },
-      ];
-    } else if (this.slugActual === 'skincare') {
-      this.grupos = [
-        { nombre: 'Cuidado facial', items: ['Limpiadores', 'Mascarillas'] },
-        { nombre: 'Protección solar', items: ['Protector solar'] },
-      ];
-    } else if (this.slugActual === 'capilar') {
-      this.grupos = [
-        { nombre: 'Tratamientos', items: ['Shampoo', 'Acondicionador'] },
-      ];
-    } else if (this.slugActual === 'accesorios') {
-      this.grupos = [
-        { nombre: 'Accesorios', items: ['Collares', 'Aretes'] },
-      ];
-    }
+setGrupos() {
+  if (this.slugActual === 'maquillaje') {
+    this.grupos = [
+      {
+        nombre: 'Rostro',
+        items: [
+          'Bases',
+          'BB Cream',
+          'Correctores',
+          'Polvos',
+          'Primer',
+          'Contornos',
+          'Iluminadores',
+          'Rubores',
+          'Bronzer',
+          'Fijadores',
+        ],
+      },
+      {
+        nombre: 'Ojos',
+        items: [
+          'Delineadores',
+          'Pestañinas',
+          'Sombras',
+          'Cejas',
+          'Pestañas postizas',
+        ],
+      },
+      {
+        nombre: 'Labios',
+        items: [
+          'Bálsamo labial',
+          'Brillo labial',
+          'Labial',
+          'Tinta de labios',
+          'Delineador de labios',
+        ],
+      },
+      {
+        nombre: 'Accesorios maquillaje',
+        items: [
+          'Brochas',
+          'Cosmetiqueras',
+          'Encrespadores',
+          'Esponjas y aplicadores',
+        ],
+      },
+      {
+        nombre: 'Otros maquillaje',
+        items: [
+          'Kits de maquillaje',
+          'Complementos',
+        ],
+      },
+    ];
   }
+
+  if (this.slugActual === 'skincare') {
+    this.grupos = [
+      {
+        nombre: 'Cuidado facial',
+        items: [
+          'Limpiadores y desmaquillantes',
+          'Aguas micelares y tónicos',
+          'Mascarillas',
+          'Hidratantes y tratamientos',
+          'Contorno de ojos',
+          'Exfoliantes faciales',
+          'Kits',
+        ],
+      },
+      {
+        nombre: 'Protección solar',
+        items: [
+          'Protector solar',
+          'Bronceadores',
+        ],
+      },
+      {
+        nombre: 'Otros cuidado',
+        items: [
+          'Depilación',
+          'Masajeadores',
+        ],
+      },
+    ];
+  }
+
+  if (this.slugActual === 'capilar') {
+    this.grupos = [
+      {
+        nombre: 'Limpieza y tratamientos',
+        items: [
+          'Shampoo',
+          'Acondicionador',
+          'Mascarillas y tratamientos',
+          'Sérum y óleos',
+        ],
+      },
+      {
+        nombre: 'Styling',
+        items: [
+          'Cremas de peinar y desenredantes',
+          'Fijadores y laca',
+          'Termoprotectores',
+          'Mousse y espumas',
+          'Shampoo seco',
+        ],
+      },
+      {
+        nombre: 'Eléctricos',
+        items: [
+          'Cepillos eléctricos',
+          'Planchas',
+          'Rizadores',
+          'Secadores',
+        ],
+      },
+    ];
+  }
+
+  if (this.slugActual === 'accesorios') {
+    this.grupos = [
+      {
+        nombre: 'Accesorios',
+        items: [
+          'Collares',
+          'Aretes',
+          'Manillas',
+        ],
+      },
+    ];
+  }
+}
+
 
   /* =======================
      CARGA PRODUCTOS (FIX)
