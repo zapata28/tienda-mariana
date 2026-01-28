@@ -5,9 +5,7 @@
   --beige-suave: #ddb892;
   --texto-principal: #000000;
 }
-/* ===============================
-   FOOTER
-================================ */
+
 .footer {
   background: var(--marron-claro);
   color: rgb(255, 255, 255);
@@ -66,15 +64,14 @@
   opacity: 0.88;
 }
 
-/* Redes */
 .footer-social {
   display: flex;
   gap: 10px;
-  margin-top: 8px;          /* ↓ */
+  margin-top: 8px;
 }
 
 .footer-social a {
-  width: 34px;               /* ↓ */
+  width: 34px;
   height: 34px;
   border-radius: 50%;
   display: grid;
@@ -95,7 +92,6 @@
   fill: currentColor;
 }
 
-/* Línea inferior */
 .footer-bottom {
   margin-top: 10px;
   padding-top: 6px;
@@ -104,15 +100,3 @@
   font-size: 12px;
   opacity: 0.8;
 }
-/* Responsive */
-
-/* @media (max-width: 720px) {
-  .footer-container {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .footer-contact {
-    min-width: 0;
-  }
-} */
